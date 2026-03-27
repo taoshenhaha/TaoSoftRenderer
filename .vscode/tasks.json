@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "src/*.cpp",
+                "src/window/*.mm",
+                "src/core/*.cpp",
+                "src/graphics/*.cpp",
+                "src/utils/*.cpp",
+                "-o",
+                "main",
+                "-std=c++11",
+                "-g", // 添加调试信息
+                "-ldl",
+                "-I", "${workspaceFolder}/src/core",
+                "-I", "${workspaceFolder}/src",
+                "-I", "${workspaceFolder}/src/graphics",
+                "-framework", "Cocoa",
+                "-framework", "Foundation"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        }
+    ]
+}

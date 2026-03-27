@@ -1,0 +1,27 @@
+# 编译生成的文件
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 可执行文件
+main
+
+# 调试文件
+*.dSYM/
+*.pdb
+
+# 编译中间文件
+*.gcno
+*.gcda
+
+# IDE 文件
+.vscode/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
