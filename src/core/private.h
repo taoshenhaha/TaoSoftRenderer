@@ -3,4 +3,4 @@
 #include "Image.h"
 #include "Graphics.h"
 
-void private_blit_rgb(Framebuffer *src, Image *dst);
+void private_blit_rgb(FrameBuffer *src, Image *dst);

@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-void private_blit_rgb(Framebuffer *src, Image *dst)
+void private_blit_rgb(FrameBuffer *src, Image *dst)
 {
     int width = dst->mWidth;
     int height = dst->mHeight;

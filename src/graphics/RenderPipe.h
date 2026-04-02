@@ -13,7 +13,7 @@ public:
     RenderPipe();
     ~RenderPipe();
     void render();
-    Framebuffer* getFrameBuffer();
+    FrameBuffer* getFrameBuffer();
     void initialize(int width, int height);
     Rasterizer* getRasterizer()
     {

@@ -1,24 +1,36 @@
+#pragma once
 #include "FrameBuffer.h"
-//所有的画直线以及画三角形的代码都写在这个类中，里面存有Framebuffer的指针
+/*
+ * @brief Rasterizer类
+ * 用于将3D模型转换为2D像素
+ * @details 该类包含了所有的像素绘制代码，包括线段、三角形等
+ * @note 该类依赖于Framebuffer类，用于存储渲染结果
+*/
+
+typedef struct {int min_x, min_y, max_x, max_y;} bbox_t;
+
 class Rasterizer
 {
 public:
-    Rasterizer(Framebuffer *fb)
-        : mFramebuffer(fb)
+    Rasterizer(FrameBuffer *fb)
+        : mFrameBuffer(fb)
     {
     }
     ~Rasterizer();
-    Framebuffer* getFramebuffer()
+    FrameBuffer* getFramebuffer()
     {
-        return mFramebuffer;
+        return mFrameBuffer;
     }
-    void clear_color(Vec4<float> color);
-    void draw_line(Vec3<float> p1, Vec3<float> p2);
-    void draw_triangle(Vec3<float> p1, Vec3<float> p2, Vec3<float> p3);
-    void set_pixel(int x, int y, Vec4<float> color);
+    void clearColor(Vec4<float> color);
+    void clearDepth(float depth);
+    bbox_t boundingBox(Vec2<float> p1, Vec2<float> p2, Vec2<float> p3);
+    Vec3<float> calcuateWeight(Vec2<float> p, Vec2<float> p1, Vec2<float> p2, Vec2<float> p3);
+    void drawLine(Vec3<float> p1, Vec3<float> p2);
+    void drawTriangle(Vec3<float> p1, Vec3<float> p2, Vec3<float> p3);
+    void setPixel(int x, int y, Vec4<float> color);
 private:
-    void draw_line_bresenham(Vec3<float> p1, Vec3<float> p2);
+    void drawLineBresenham(Vec3<float> p1, Vec3<float> p2);
 
 private:
-    Framebuffer *mFramebuffer{ nullptr };
+    FrameBuffer *mFrameBuffer{ nullptr };
 };

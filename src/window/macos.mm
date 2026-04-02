@@ -296,7 +296,7 @@ static void present_surface(window_t *window) {
     [[window->handle contentView] setNeedsDisplay:YES];  /* invoke drawRect */
 }
 
-void window_draw_buffer(window_t *window, Framebuffer *buffer) {
+void window_draw_buffer(window_t *window, FrameBuffer *buffer) {
     private_blit_rgb(buffer, window->surface);
     present_surface(window);
 }
