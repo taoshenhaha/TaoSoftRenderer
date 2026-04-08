@@ -12,7 +12,20 @@ public:
     explicit Vec3(T scaler)
         : x(scaler), y(scaler), z(scaler) {}
     
-    
+    T& operator[](int index)
+    {
+        switch (index)
+        {
+        case 0:
+            return x;
+        case 1:
+            return y;
+        case 2:
+            return z;
+        default:
+            return x;
+        }
+    }
     Vec3 operator+(const Vec3& rhs)
     {
         return Vec3(x + rhs.x, y + rhs.y, z + rhs.z);

@@ -26,9 +26,9 @@ software-renderer/
 第1阶段：基础框架（2-3周）
 
 1. 数学库 (3-5天)
-   • 实现Vector2/3/4、Matrix3x3/4x4、Quaternion
+   • 实现Vector2/3/4、Matrix3x3/4x4、Quaternion ✅
 
-   • 实现必要的线性代数运算
+   • 实现必要的线性代数运算 ✅
 
    • 添加SIMD优化（可选）
 

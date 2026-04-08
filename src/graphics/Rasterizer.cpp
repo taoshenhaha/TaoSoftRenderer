@@ -128,9 +128,6 @@ void Rasterizer::drawTriangle(Vec3<float> p1, Vec3<float> p2, Vec3<float> p3)
             }
         }
     }
-
-
-
 }
 void Rasterizer::setPixel(int x, int y, Vec4<float> color)
 {
@@ -193,5 +190,4 @@ Vec3<float> Rasterizer::calcuateWeight(Vec2<float> p, Vec2<float> p1, Vec2<float
     float t = (ab.x * ap.y - ab.y * ap.x) * factor;
     weight = { 1 - s - t, s, t };
     return weight;
-
 }

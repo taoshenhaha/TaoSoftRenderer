@@ -19,6 +19,7 @@
                 "-I", "${workspaceFolder}/src/core",
                 "-I", "${workspaceFolder}/src",
                 "-I", "${workspaceFolder}/src/graphics",
+                "-I", "${workspaceFolder}/src/utils",
                 "-framework", "Cocoa",
                 "-framework", "Foundation"
             ],

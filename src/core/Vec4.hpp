@@ -16,6 +16,15 @@ public:
         : x(vec3.x), y(vec3.y), z(vec3.z), w(w_) {}
     
     
+    T& operator[](int index)
+    {
+        return (index == 0) ? x : (index == 1) ? y : (index == 2) ? z : w;
+    }
+    T operator[](int index) const
+    {
+        return (index == 0) ? x : (index == 1) ? y : (index == 2) ? z : w;
+    }
+    
     bool operator==(const Vec4& rhs) const
     {
         return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w;

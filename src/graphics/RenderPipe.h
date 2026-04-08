@@ -1,5 +1,6 @@
 #pragma once
 #include "Rasterizer.h"
+#include "Camera.h"
 
 /*
 渲染管线
@@ -21,4 +22,6 @@ public:
     }
 private:
     Rasterizer *mRasterizer{ nullptr };
+    Camera *mCamera{ nullptr };
+    
 };
