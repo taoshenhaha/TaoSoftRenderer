@@ -10,7 +10,7 @@ RenderPipe::~RenderPipe()
 void RenderPipe::initialize(int width, int height)
 {
     mRasterizer = new Rasterizer(new FrameBuffer(width, height));
-    mCamera = new Camera({ 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+    mCamera = new Camera({ 0.0f, 30.0f, 15.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 }
 
 void RenderPipe::render()
@@ -23,8 +23,7 @@ void RenderPipe::render()
     float zFar = 50.0f;
     //先使用mvp矩阵乘法，将顶点坐标转换为屏幕坐标
     Mat4<float> mModelMatrix;
-    Mat4<float> mvp = mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar) * /*mCamera->getViewMatrix()*/  mModelMatrix;
-    // Mat4<float> mvp = mModelMatrix;
+    Mat4<float> mvp = mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar) * mCamera->getViewMatrix() * mModelMatrix;
     mRasterizer->clearColor({ 0.2f, 0.2f, 0.3f, 1.0f });
     // mRasterizer->drawLine({ 300.0f, 588.0f, 0.0f }, { 100.0f, 10.0f, 0.0f });
     // 这里可以使用mvp矩阵进行渲染

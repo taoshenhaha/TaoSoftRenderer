@@ -68,7 +68,7 @@ Mat4<float> Camera::getProjectionMatrix(float eye_fov, float aspect_ratio,
     projection.m[2][1] = 0;
     projection.m[2][2] = -(zNear + zFar) / (zFar - zNear);
     projection.m[2][3] = -2 * zNear * zFar / (zFar - zNear);
-    
+
     projection.m[3][0] = 0;
     projection.m[3][1] = 0;
     projection.m[3][2] = -1;
@@ -79,27 +79,39 @@ Mat4<float> Camera::getProjectionMatrix(float eye_fov, float aspect_ratio,
 
 Mat4<float> Camera::lookAt(Vec3<float> eye, Vec3<float> target, Vec3<float> up) 
 {
-    
+    // 正确的lookAt矩阵计算
+    // z轴：从目标指向相机的方向（相机看向-z方向）
     Vec3<float> z_axis = (eye - target).normalize();
-    Vec3<float> x_axis = (up - z_axis).normalize();
-    Vec3<float> y_axis = (z_axis - x_axis).normalize();
+    
+    // x轴：up向量与z轴的叉积（右手坐标系）
+    Vec3<float> x_axis = up.cross(z_axis).normalize();
+    
+    // y轴：z轴与x轴的叉积，确保正交
+    Vec3<float> y_axis = z_axis.cross(x_axis);
+    
     Mat4<float> m;
 
+    // 旋转部分：将相机坐标系对齐到世界坐标系
     m.m[0][0] = x_axis.x;
-    m.m[0][1] = x_axis.y;
-    m.m[0][2] = x_axis.z;
+    m.m[0][1] = y_axis.x;  // 注意：这里是转置矩阵
+    m.m[0][2] = z_axis.x;
+    m.m[0][3] = 0;
 
-    m.m[1][0] = y_axis.x;
+    m.m[1][0] = x_axis.y;
     m.m[1][1] = y_axis.y;
-    m.m[1][2] = y_axis.z;
+    m.m[1][2] = z_axis.y;
+    m.m[1][3] = 0;
 
-    m.m[2][0] = z_axis.x;
-    m.m[2][1] = z_axis.y;
+    m.m[2][0] = x_axis.z;
+    m.m[2][1] = y_axis.z;
     m.m[2][2] = z_axis.z;
+    m.m[2][3] = 0;
 
+    // 平移部分：将相机移动到原点
     m.m[0][3] = -x_axis.dot(eye);
     m.m[1][3] = -y_axis.dot(eye);
     m.m[2][3] = -z_axis.dot(eye);
+    m.m[3][3] = 1;
 
     return m;
 }
