@@ -1,21 +1,32 @@
-/*
- * @brief Program类
- * 用于管理渲染程序，包括顶点着色器、片段着色器等
- * @details 该类包含了顶点着色器、片段着色器等渲染程序组件，用于渲染场景
- * @note 该类依赖于Shader类，用于加载和编译着色器
- **/
 #pragma once
-#include "Shader.hpp"
-class Program
-{
-public:
-    Program();
-    ~Program();
-    void addShader(ShaderType type, std::string path);
-    void link();
-    void use();
-    void draw();
-private:
-    std::vector<Shader*> mShaders;
+
+#include "BaseShader.hpp"
+#include "../core/Vec3.hpp"
+#include "../core/Vec4.hpp"
+#include "../core/Mat4.hpp"
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+/**
+ * @brief Program类 - 管理着色器程序
+ * @details 将多个着色器链接成完整的着色器程序，提供统一变量管理
+ */
+enum class ShaderType
+ {
+    COLOR,
+    NORMAL,
+    GEOMETRY,
+    TEXTURE
 };
-#endif
+class Program {
+
+public:
+    Program() = default;
+    ~Program() = default;
+    void addShader(ShaderType type, std::shared_ptr<BaseShader> shader);
+    std::shared_ptr<BaseShader> getShader(ShaderType type);
+
+private:
+    std::unordered_map<ShaderType, std::shared_ptr<BaseShader>> mShaderMap;
+};

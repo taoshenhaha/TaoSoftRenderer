@@ -26,7 +26,7 @@ public:
             return x;
         }
     }
-    Vec3 operator+(const Vec3& rhs)
+    Vec3 operator+(const Vec3& rhs) const
     {
         return Vec3(x + rhs.x, y + rhs.y, z + rhs.z);
     }
@@ -36,7 +36,7 @@ public:
         return Vec3(x - rhs.x, y - rhs.y, z - rhs.z);
     }
 
-    Vec3 operator*(T scaler)
+    Vec3 operator*(T scaler) const
     {
         return Vec3(x * scaler, y * scaler, z * scaler);
     }

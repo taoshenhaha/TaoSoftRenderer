@@ -5,7 +5,7 @@
 #include <mach-o/dyld.h>
 #include <mach/mach_time.h>
 #include <unistd.h>
-#include "Graphics.h"
+#include "../graphics/Graphics.h"
 #include "../core/Image.h"
 #include "../core/macro.h"
 #include "../core/platform.h"

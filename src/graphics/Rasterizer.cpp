@@ -191,3 +191,80 @@ Vec3<float> Rasterizer::calcuateWeight(Vec2<float> p, Vec2<float> p1, Vec2<float
     weight = { 1 - s - t, s, t };
     return weight;
 }
+
+// 插值函数实现
+Vec4<float> Rasterizer::interpolate(const Vec4<float>& a, const Vec4<float>& b, const Vec4<float>& c, const Vec3<float>& weights) {
+    return a * weights.x + b * weights.y + c * weights.z;
+}
+
+Vec3<float> Rasterizer::interpolate(const Vec3<float>& a, const Vec3<float>& b, const Vec3<float>& c, const Vec3<float>& weights) {
+    return a * weights.x + b * weights.y + c * weights.z;
+}
+
+Vec2<float> Rasterizer::interpolate(const Vec2<float>& a, const Vec2<float>& b, const Vec2<float>& c, const Vec3<float>& weights) {
+    return a * weights.x + b * weights.y + c * weights.z;
+}
+
+// 支持着色器的三角形绘制
+void Rasterizer::drawTriangleWithShader(const Vec3<float>& p1, const Vec3<float>& p2, const Vec3<float>& p3,
+                                       const Vec3<float>& n1, const Vec3<float>& n2, const Vec3<float>& n3,
+                                       const Vec2<float>& uv1, const Vec2<float>& uv2, const Vec2<float>& uv3) {
+    if (mFrameBuffer == nullptr || m_currentShader == nullptr) {
+        return;
+    }
+    
+    // 应用顶点着色器
+    Vec4<float> v1 = m_currentShader->vertexShader(p1, n1, uv1);
+    Vec4<float> v2 = m_currentShader->vertexShader(p2, n2, uv2);
+    Vec4<float> v3 = m_currentShader->vertexShader(p3, n3, uv3);
+    
+    // 透视除法
+    if (v1.w != 0.0f) { v1 /= v1.w; }
+    if (v2.w != 0.0f) { v2 /= v2.w; }
+    if (v3.w != 0.0f) { v3 /= v3.w; }
+    
+    // 屏幕映射（从NDC [-1,1] 到屏幕坐标）
+    float zNear = 0.1f;
+    float zFar = 50.0f;
+    float f1 = (zFar - zNear) / 2.0;
+    float f2 = (zFar + zNear) / 2.0;
+
+    int width = getFramebuffer()->mWidth;
+    int height = getFramebuffer()->mHeight;
+    v1.x = 0.5*width*(v1.x+1.0);
+    v1.y = 0.5*height*(v1.y+1.0);
+    v1.z = v1.z * f1 + f2;
+    v2.x = 0.5*width*(v2.x+1.0);
+    v2.y = 0.5*height*(v2.y+1.0);
+    v2.z = v2.z * f1 + f2;
+    v3.x = 0.5*width*(v3.x+1.0);
+    v3.y = 0.5*height*(v3.y+1.0);
+    v3.z = v3.z * f1 + f2;
+    Vec2<float> vertex11 = { v1.x, v1.y };
+    Vec2<float> vertex21 = { v2.x, v2.y };
+    Vec2<float> vertex31 = { v3.x, v3.y };
+    
+    // 计算边界框
+    bbox_t bbox = boundingBox(vertex11, vertex21, vertex31);
+    
+    // 光栅化
+    for (int y = bbox.min_y; y <= bbox.max_y; y++) {
+        for (int x = bbox.min_x; x <= bbox.max_x; x++) {
+            Vec2<float> p = { (float)x + 0.5f, (float)y + 0.5f };
+            Vec3<float> weights = calcuateWeight(p, vertex11, vertex21, vertex31);
+            
+            if (weights.x >= 0.0f && weights.y >= 0.0f && weights.z >= 0.0f) {
+                // 插值顶点属性
+                Vec2<float> position = interpolate(vertex11, vertex21, vertex31, weights);
+                //暂时不用normal和texcoord
+                // Vec3<float> normal = interpolate(n1, n2, n3, weights);
+                // Vec2<float> texcoord = interpolate(uv1, uv2, uv3, weights);
+                Vec3<float> position3 = { position.x, position.y, 0.0f };
+                // 应用片段着色器
+                Vec4<float> color = m_currentShader->fragmentShader(position3, {}, {});
+                
+                setPixel(x, y, color);
+            }
+        }
+    }
+}
