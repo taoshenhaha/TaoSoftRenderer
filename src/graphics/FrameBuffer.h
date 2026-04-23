@@ -27,7 +27,9 @@ public:
     void clearColor( Vec4<float> color);
     void clearDepth(float depth);
     void setPixel(int x, int y, Vec4<float> color);
-public:
+    void setDepth(int x, int y, float depth);
+    float getDepth(int x, int y);
+   public:
     int mWidth{ 0 };
     int mHeight{ 0 };
     Vec4<float> *mColorBuffer{ nullptr };

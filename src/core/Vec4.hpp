@@ -130,7 +130,10 @@ public:
     {
         return Vec4<T>(x, y, z, w);
     }
-
+    Vec4<T> lerp(const Vec4<T>& rhs, T ratio) const
+    {
+        return Vec4<T>(x + (rhs.x - x) * ratio, y + (rhs.y - y) * ratio, z + (rhs.z - z) * ratio, w + (rhs.w - w) * ratio);
+    }
 
 
 

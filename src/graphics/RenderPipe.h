@@ -28,5 +28,5 @@ public:
 private:
     Rasterizer *mRasterizer{ nullptr };
     Camera *mCamera{ nullptr };
-    Program *mProgram{ nullptr };
+    std::shared_ptr<BaseProgram> mProgram{ nullptr };
 };

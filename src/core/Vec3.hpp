@@ -141,6 +141,10 @@ public:
         return *this;
     }
 
+    Vec3 lerp(const Vec3& rhs, T ratio) const
+    {
+        return Vec3(x + (rhs.x - x) * ratio, y + (rhs.y - y) * ratio, z + (rhs.z - z) * ratio);
+    }
 
 
 

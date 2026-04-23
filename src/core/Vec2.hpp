@@ -25,4 +25,10 @@ public:
     {
         return Vec2(x * scaler, y * scaler);
     }
+
+    Vec2 lerp(const Vec2& rhs, T ratio) const
+    {
+        return Vec2(x + (rhs.x - x) * ratio, y + (rhs.y - y) * ratio);
+    }
+    
 };

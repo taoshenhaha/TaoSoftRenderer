@@ -35,3 +35,21 @@ void FrameBuffer::setPixel(int x, int y, Vec4<float> color)
     mColorBuffer[y * mWidth + x].z = float_to_uchar(color.z);
     mColorBuffer[y * mWidth + x].w = float_to_uchar(color.w);
 }
+
+void FrameBuffer::setDepth(int x, int y, float depth)
+{
+    if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
+    {
+        return;
+    }
+    mDepthBuffer[y * mWidth + x] = depth;
+}
+
+float FrameBuffer::getDepth(int x, int y)
+{
+    if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
+    {
+        return 0.f;
+    }
+    return mDepthBuffer[y * mWidth + x];
+}
