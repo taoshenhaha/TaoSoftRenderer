@@ -4,6 +4,7 @@
 #include "../core/Vec3.hpp"
 #include "../core/Vec4.hpp"
 #include "../core/Mat4.hpp"
+#include "../graphics/Texture.h"
 #include <string>
 #include <unordered_map>
 
@@ -26,6 +27,20 @@ blinn_attribs_t // 顶点着色器输入的变量
     Vec4<float> joint;
     Vec4<float> weight;
 };
+
+struct blinn_uniforms_t // 片段着色器输入的变量
+{
+    Mat4<float> mvp;
+    Mat4<float> model;
+    Mat4<float> view;
+    Mat4<float> projection;
+    Vec3<float> light_position;
+    Vec3<float> camera_position;
+    Vec3<float> light_color;
+    Vec3<float> ambient_color;
+    Vec3<float> diffuse_color;
+};
+
 /**
  * @brief BaseProgram类 - 基础程序基类
  * @details 提供统一的着色器接口，支持顶点和片段着色器阶段
@@ -112,6 +127,9 @@ public:
     Vec4<float> out_coords[MAX_VARYINGS];
     blinn_varyings_t in_varyings[MAX_VARYINGS];
     blinn_varyings_t out_varyings[MAX_VARYINGS];
+    //测试texture
+    Texture *m_texture{ nullptr };
+
 
 protected:
     std::unordered_map<std::string, Mat4<float>> m_matrixUniforms;
@@ -148,7 +166,10 @@ public:
     }
     
     Vec4<float> fragmentShader(blinn_varyings_t varyings) override {
-        return Vec4<float>(m_color, 1.0f);
+
+        // 从纹理采样颜色
+        Vec4<float> texel = m_texture->sample(varyings.texcoord);
+        return texel;
     }
     
     void setColor(const Vec3<float>& color) { m_color = color; }

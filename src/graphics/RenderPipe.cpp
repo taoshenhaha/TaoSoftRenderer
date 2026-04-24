@@ -14,7 +14,7 @@ void RenderPipe::initialize(int width, int height)
     mCamera = new Camera({ 0.0f, 0.0f, 4.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
     mProgram = std::make_shared<ColorProgram>();
-    
+    mProgram->m_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/face_basecolor.tga", TextureUsage::LDR_COLOR);
 }
 
 void RenderPipe::render()
@@ -66,11 +66,11 @@ void RenderPipe::render()
         attributes[0].normal = normal;
 
         attributes[1].position = P2;
-        attributes[1].texcoord = { 0.0f, 0.0f };
+        attributes[1].texcoord = { 0.0f, 1.0f };
         attributes[1].normal = normal;
 
         attributes[2].position = P3;
-        attributes[2].texcoord = { 0.0f, 0.0f };
+        attributes[2].texcoord = { 1.0f, 0.0f };
         attributes[2].normal = normal;
 
         // program->setShaderAttribs(attributes);
@@ -85,11 +85,11 @@ void RenderPipe::render()
         Vec3<float> P6 = { 0.0f, 4.0f, -10.0f };
         
         attributes[0].position = P4;
-        attributes[0].texcoord = { 0.0f, 0.0f };
+        attributes[0].texcoord = { 0.0f, 1.0f };
         attributes[0].normal = normal;
 
         attributes[1].position = P5;
-        attributes[1].texcoord = { 0.0f, 0.0f };
+        attributes[1].texcoord = { 1.0f, 0.0f };
         attributes[1].normal = normal;
 
         attributes[2].position = P6;

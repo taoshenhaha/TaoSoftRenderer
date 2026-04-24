@@ -6,14 +6,15 @@
 #include <mach/mach_time.h>
 #include <unistd.h>
 #include "../graphics/Graphics.h"
-#include "../core/Image.h"
+#include "../utils/utils.h"
+#include "../core/image.h"
 #include "../core/macro.h"
 #include "../core/platform.h"
 #include "../core/private.h"
 
 struct window {
     NSWindow *handle;
-    Image *surface;
+    image_t *surface;
     /* common data */
     int should_close;
     char keys[KEY_NUM];
@@ -159,17 +160,17 @@ static void handle_scroll_event(window_t *window, float offset) {
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
-    Image *surface = _window->surface;
+    image_t *surface = _window->surface;
     NSBitmapImageRep *rep = [[[NSBitmapImageRep alloc]
-            initWithBitmapDataPlanes:&(surface->mLdrBuffer)
-                          pixelsWide:surface->mWidth
-                          pixelsHigh:surface->mHeight
+            initWithBitmapDataPlanes:&(surface->ldr_buffer)
+                          pixelsWide:surface->width
+                          pixelsHigh:surface->height
                        bitsPerSample:8
                      samplesPerPixel:3
                             hasAlpha:NO
                             isPlanar:NO
                       colorSpaceName:NSCalibratedRGBColorSpace
-                         bytesPerRow:surface->mWidth * 4    
+                         bytesPerRow:surface->width * 4    
                         bitsPerPixel:32] autorelease];
     NSImage *nsimage = [[[NSImage alloc] init] autorelease];
     [nsimage addRepresentation:rep];
@@ -258,8 +259,8 @@ window_t *window_create(const char *title, int width, int height) {
     window = (window_t*)malloc(sizeof(window_t));
     memset(window, 0, sizeof(window_t));
     window->handle = create_window(window, title, width, height);
-    window->surface = new Image(width, height, 4, format_t::FORMAT_LDR);
-
+    window->surface = image_create(width, height, 4, format_t::FORMAT_LDR);
+    
     [window->handle makeKeyAndOrderFront:nil];
     return window;
 }

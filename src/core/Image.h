@@ -1,30 +1,26 @@
-#pragma once
+#ifndef IMAGE_H
+#define IMAGE_H
 
-#include <stdint.h>
-
-enum class format_t : uint16_t
-{
-    FORMAT_LDR, 
+typedef enum {
+    FORMAT_LDR,
     FORMAT_HDR
-};
+} format_t;
 
-class Image
-{
-public:
-    int mWidth{ 0 };
-    int mHeight{ 0 };
-    int mChannels{ 0 };
-    format_t mFormat{ format_t::FORMAT_LDR };
-    unsigned char *mLdrBuffer{ nullptr };
-    float *mHdrBuffer{ nullptr };
-    bool mIsInitialized{ false };
+typedef struct {
+    format_t format;
+    int width, height, channels;
+    unsigned char *ldr_buffer;
+    float *hdr_buffer;
+} image_t;
 
-public:
-   
-    Image(int width, int height, int channels, format_t format);
-    ~Image()
-    {
-        release();
-    }
-    void release();
-};
+/* image creating/releasing */
+image_t *image_create(int width, int height, int channels, format_t format);
+void image_release(image_t *image);
+image_t *image_load(const char *filename);
+void image_save(image_t *image, const char *filename);
+
+/* image processing */
+void image_flip_h(image_t *image);
+void image_flip_v(image_t *image);
+
+#endif

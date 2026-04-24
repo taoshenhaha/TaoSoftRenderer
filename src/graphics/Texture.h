@@ -1,56 +1,66 @@
 #pragma once
 
-#include "../core/Vec2.hpp"
-#include "../core/Vec4.hpp"
-#include "../core/Image.h"
+#include "Graphics.h"
+#include "../core/image.h"
 #include <string>
 
-enum class TextureFilter : uint8_t
+enum class TextureUsage
 {
-    NEAREST,
-    LINEAR
-};
-
-enum class TextureWrap : uint8_t
-{
-    REPEAT,
-    CLAMP
+    LDR_COLOR,
+    LDR_DATA,
+    HDR_COLOR,
+    HDR_DATA
 };
 
 class Texture
 {
 public:
     Texture();
-    Texture(Image* image);
+    Texture(int width, int height);
     ~Texture();
 
-    void setImage(Image* image);
-    void setFilter(TextureFilter minFilter, TextureFilter magFilter);
-    void setWrap(TextureWrap wrapU, TextureWrap wrapV);
+    static Texture* createFromFile(const char* filename, TextureUsage usage);
+    static Texture* createFromImage(image_t* image, TextureUsage usage);
 
-    Vec4<float> sample(Vec2<float> uv) const;
-    Vec4<float> sampleNearest(Vec2<float> uv) const;
-    Vec4<float> sampleLinear(Vec2<float> uv) const;
+    void release();
+
+    void fromColorbuffer(void* framebuffer);
+    void fromDepthbuffer(void* framebuffer);
+
+    Vec4<float> sampleRepeat(Vec2<float> texcoord) const;
+    Vec4<float> sampleClamp(Vec2<float> texcoord) const;
+    Vec4<float> sample(Vec2<float> texcoord) const;
 
     int getWidth() const { return mWidth; }
     int getHeight() const { return mHeight; }
-    bool isValid() const { return mIsValid; }
-
-private:
-    Vec4<float> sampleClamp(Vec2<float> uv) const;
-    Vec4<float> sampleRepeat(Vec2<float> uv) const;
-
-    Vec4<float> getPixelBilinear(float u, float v) const;
-    Vec4<float> getPixel(int x, int y) const;
+    Vec4<float>* getBuffer() { return mBuffer; }
 
 private:
     int mWidth{ 0 };
     int mHeight{ 0 };
-    int mChannels{ 0 };
-    unsigned char* mData{ nullptr };
-    TextureFilter mMinFilter{ TextureFilter::NEAREST };
-    TextureFilter mMagFilter{ TextureFilter::LINEAR };
-    TextureWrap mWrapU{ TextureWrap::REPEAT };
-    TextureWrap mWrapV{ TextureWrap::REPEAT };
-    bool mIsValid{ false };
+    Vec4<float>* mBuffer{ nullptr };
+};
+
+class Cubemap
+{
+public:
+    Cubemap();
+    ~Cubemap();
+
+    static Cubemap* createFromFiles(const char* positive_x, const char* negative_x,
+                                    const char* positive_y, const char* negative_y,
+                                    const char* positive_z, const char* negative_z,
+                                    TextureUsage usage);
+
+    void release();
+
+    Vec4<float> sampleRepeat(Vec3<float> direction) const;
+    Vec4<float> sampleClamp(Vec3<float> direction) const;
+    Vec4<float> sample(Vec3<float> direction) const;
+
+private:
+    int selectFace(Vec3<float> direction, Vec2<float>& texcoord) const;
+
+private:
+    Texture* mFaces[6];
 };
