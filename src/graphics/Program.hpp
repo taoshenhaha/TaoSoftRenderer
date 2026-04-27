@@ -138,8 +138,6 @@ protected:
     std::unordered_map<std::string, float> m_floatUniforms;
     std::unordered_map<std::string, int> m_intUniforms;
     std::unordered_map<std::string, int> m_attributeLocations;
-    blinn_varyings_t m_varyings; //插值计算的临时变量
-    blinn_attribs_t m_attribs; //顶点属性，包含顶点着色器输入的变量
     
 };
 
@@ -157,10 +155,10 @@ public:
         Mat4<float> model = getMatrixUniform("model");
         Vec4<float> clip_position = mvp * Vec4<float>(attribs.position, 1.0f);
         // 计算插值变量
-        m_varyings.world_position = model * attribs.position;
-        m_varyings.normal = attribs.normal;
-        m_varyings.texcoord = attribs.texcoord; 
-        m_varyings.depth_position = clip_position.toVec3();
+        shader_varyings.world_position = model * attribs.position;
+        shader_varyings.normal = attribs.normal;
+        shader_varyings.texcoord = attribs.texcoord; 
+        shader_varyings.depth_position = clip_position.toVec3();
 
         return clip_position;
     }

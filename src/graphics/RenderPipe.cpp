@@ -14,7 +14,7 @@ void RenderPipe::initialize(int width, int height)
     mCamera = new Camera({ 0.0f, 0.0f, 4.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
     mProgram = std::make_shared<ColorProgram>();
-    mProgram->m_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/face_basecolor.tga", TextureUsage::LDR_COLOR);
+    mProgram->m_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/floor_diffuse.tga", TextureUsage::LDR_COLOR);
 }
 
 void RenderPipe::render()
@@ -51,10 +51,15 @@ void RenderPipe::render()
         program->setUniform("projection", mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar));
         
         // 使用着色器绘制另一个三角形（偏移位置）
-        Vec3<float> P1 = { 2.0f, 0.0f, -5.0f };
-        Vec3<float> P2 = { 0.0f, 2.0f, -5.0f };
-        Vec3<float> P3 = { -2.0f, 0.0f, -5.0f };
-        
+        Vec3<float> P1 = { -2.0f, -2.0f, -5.0f };
+        Vec3<float> P2 = { 2.0f, -2.0f, -5.0f };
+        Vec3<float> P3 = { -2.0f, 2.0f, -5.0f };
+        Vec2<float> texcoord1 = { 0.0f, 0.0f };
+        Vec2<float> texcoord2 = { 1.0f, 0.0f };
+        Vec2<float> texcoord3 = { 0.0f, 1.0f };
+
+
+
         
         // 定义法线（用于法线着色器）
         Vec3<float> normal = { 0.0f, 0.0f, 1.0f };
@@ -62,38 +67,37 @@ void RenderPipe::render()
         blinn_attribs_t attributes[3];
 
         attributes[0].position = P1;
-        attributes[0].texcoord = { 0.0f, 0.0f };
+        attributes[0].texcoord = texcoord1;
         attributes[0].normal = normal;
 
         attributes[1].position = P2;
-        attributes[1].texcoord = { 0.0f, 1.0f };
+        attributes[1].texcoord = texcoord2;
         attributes[1].normal = normal;
 
         attributes[2].position = P3;
-        attributes[2].texcoord = { 1.0f, 0.0f };
+        attributes[2].texcoord = texcoord3;
         attributes[2].normal = normal;
 
         // program->setShaderAttribs(attributes);
         mRasterizer->drawTriangleWithProgram(attributes);
 
+        Vec3<float> P4 = { -2.0f, 2.0f, -5.0f };
+        Vec3<float> P5 = { 2.0f, -2.0f, -5.0f };
+        Vec3<float> P6 = { 2.0f, 2.0f, -5.0f };
+        Vec2<float> texcoord4 = { 0.0f, 1.0f };
+        Vec2<float> texcoord5 = { 1.0f, 0.0f };
+        Vec2<float> texcoord6 = { 1.0f, 1.0f };
 
-        if (colorProgram) {
-            colorProgram->setColor({ 1.0f, 0.0f, 0.0f });
-        }
-        Vec3<float> P4 = { 4.0f, 0.0f, -10.0f };
-        Vec3<float> P5 = { -4.0f, 0.0f, -10.0f };
-        Vec3<float> P6 = { 0.0f, 4.0f, -10.0f };
-        
         attributes[0].position = P4;
-        attributes[0].texcoord = { 0.0f, 1.0f };
+        attributes[0].texcoord = texcoord4;
         attributes[0].normal = normal;
 
         attributes[1].position = P5;
-        attributes[1].texcoord = { 1.0f, 0.0f };
+        attributes[1].texcoord = texcoord5;
         attributes[1].normal = normal;
 
         attributes[2].position = P6;
-        attributes[2].texcoord = { 0.0f, 0.0f };
+        attributes[2].texcoord = texcoord6;
         attributes[2].normal = normal;
 
         mRasterizer->drawTriangleWithProgram(attributes);

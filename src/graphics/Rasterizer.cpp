@@ -251,6 +251,7 @@ void Rasterizer::drawTriangleWithProgram(blinn_attribs_t attributes[3]) {
     // 应用顶点着色器
     for(int i = 0; i < 3; i++) {
         Vec4<float> clip_position = m_currentProgram->vertexShader(attributes[i]);
+        m_currentProgram->in_varyings[i] = m_currentProgram->shader_varyings;
         m_currentProgram->in_coords[i] = clip_position;
     }
 
@@ -491,8 +492,6 @@ int Rasterizer::rasterizeTriangle(Vec4<float> clip_coords[3], blinn_varyings_t v
         return 1;
     }
 
-
-    
     // 计算边界框
     bbox_t bbox = boundingBox(screen_coords);
     
