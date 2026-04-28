@@ -2,6 +2,7 @@
 #include "Program.hpp"
 #include "Mat4.hpp"
 #include "utils.h"
+#include <iostream>
 
 RenderPipe::RenderPipe()
 {
@@ -38,16 +39,17 @@ static float deltaTime = 0.0f;
 static bool isfirstframe = true;
 void RenderPipe::render()
 {
-    //这里可以使用shader进行渲染    
     float currentFrame = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1000.0f;
     if(isfirstframe) {
         isfirstframe = false;
         lastFrame = currentFrame;   
-        return;
+    } else {
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
     }
     
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
+    mFPSCounter.update();
+    drawFPS();
     float modelmovespeed = static_cast<float>(5 * deltaTime);
     
 
@@ -137,6 +139,7 @@ void RenderPipe::render()
 
         mRasterizer->drawTriangleWithProgram(attributes);
     }
+    
 }
 
 FrameBuffer* RenderPipe::getFrameBuffer()
@@ -148,4 +151,72 @@ void RenderPipe::useColorShader(const Vec3<float>& color) {
     auto program = std::make_shared<ColorProgram>(color);
     // mRasterizer->setProgram(program);
     std::cout << "使用颜色着色器 (颜色: " << color.x << ", " << color.y << ", " << color.z << ")" << std::endl;
+}
+
+static const unsigned char digit_3x5[10][5] = {
+    {0x7, 0x5, 0x5, 0x5, 0x7},
+    {0x2, 0x6, 0x2, 0x2, 0x7},
+    {0x7, 0x1, 0x7, 0x4, 0x7},
+    {0x7, 0x1, 0x7, 0x1, 0x7},
+    {0x5, 0x5, 0x7, 0x1, 0x1},
+    {0x7, 0x4, 0x7, 0x1, 0x7},
+    {0x7, 0x4, 0x7, 0x5, 0x7},
+    {0x7, 0x1, 0x2, 0x4, 0x4},
+    {0x7, 0x5, 0x7, 0x5, 0x7},
+    {0x7, 0x5, 0x7, 0x1, 0x7}
+};
+
+void RenderPipe::drawFPS()
+{
+    int fps = mFPSCounter.getFPS();
+    if (fps <= 0) return;
+    
+    std::cout << "Drawing FPS: " << fps << std::endl;
+    
+    FrameBuffer* fb = mRasterizer->getFramebuffer();
+    int startX = 10;
+    int startY = 10;
+    Vec4<float> color = {1.0f, 1.0f, 0.0f, 1.0f};
+    
+    if (fps >= 100) {
+        int hundreds = fps / 100;
+        int tens = (fps / 10) % 10;
+        int ones = fps % 10;
+        
+        for (int d = 0; d < 3; ++d) {
+            int digit = (d == 0) ? hundreds : (d == 1) ? tens : ones;
+            for (int row = 0; row < 5; ++row) {
+                unsigned char pattern = digit_3x5[digit][row];
+                for (int col = 0; col < 3; ++col) {
+                    if (pattern & (1 << (2 - col))) {
+                        fb->setPixel(startX + d * 4 + col, startY + row, color);
+                    }
+                }
+            }
+        }
+    } else if (fps >= 10) {
+        int tens = fps / 10;
+        int ones = fps % 10;
+        
+        for (int d = 0; d < 2; ++d) {
+            int digit = (d == 0) ? tens : ones;
+            for (int row = 0; row < 5; ++row) {
+                unsigned char pattern = digit_3x5[digit][row];
+                for (int col = 0; col < 3; ++col) {
+                    if (pattern & (1 << (2 - col))) {
+                        fb->setPixel(startX + d * 4 + col, startY + row, color);
+                    }
+                }
+            }
+        }
+    } else {
+        for (int row = 0; row < 5; ++row) {
+            unsigned char pattern = digit_3x5[fps][row];
+            for (int col = 0; col < 3; ++col) {
+                if (pattern & (1 << (2 - col))) {
+                    fb->setPixel(startX + col, startY + row, color);
+                }
+            }
+        }
+    }
 }

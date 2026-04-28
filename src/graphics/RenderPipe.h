@@ -3,6 +3,34 @@
 #include "Camera.h"
 #include "Program.hpp"
 #include <memory>
+#include <chrono>
+
+class FPSCounter
+{
+public:
+    FPSCounter() : frameCount(0), lastTime(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count()), fps(0) {}
+    
+    void update()
+    {
+        frameCount++;
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime.time_since_epoch()).count();
+        
+        if (elapsed - lastTime >= 1000)
+        {
+            fps = frameCount;
+            frameCount = 0;
+            lastTime = elapsed;
+        }
+    }
+    
+    int getFPS() const { return fps; }
+    
+private:
+    int frameCount;
+    long long lastTime;
+    int fps;
+};
 
 /*
 渲染管线
@@ -29,4 +57,7 @@ private:
     Rasterizer *mRasterizer{ nullptr };
     Camera *mCamera{ nullptr };
     std::shared_ptr<BaseProgram> mProgram{ nullptr };
+    FPSCounter mFPSCounter;
+    
+    void drawFPS();
 };

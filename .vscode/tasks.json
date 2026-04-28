@@ -14,7 +14,8 @@
                 "-o",
                 "main",
                 "-std=c++11",
-                "-g", // 添加调试信息
+                // "-O2",
+                "-g", // 调试时取消注释
                 "-ldl",
                 "-I", "${workspaceFolder}/src/core",
                 "-I", "${workspaceFolder}/src",
