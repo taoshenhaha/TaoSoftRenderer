@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <iostream>
 
 namespace
 {
@@ -195,7 +196,81 @@ Vec4<float> Texture::sampleClamp(Vec2<float> texcoord) const
 
 Vec4<float> Texture::sample(Vec2<float> texcoord) const
 {
+    if (mFilter == TextureFilter::LINEAR)
+    {
+        return sampleBilinear(texcoord);
+    }
     return sampleRepeat(texcoord);
+}
+
+Vec4<float> Texture::getPixel(int x, int y) const
+{
+    if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
+    {
+        return Vec4<float>(0.0f, 0.0f, 0.0f, 1.0f);
+    }
+    return mBuffer[y * mWidth + x];
+}
+
+Vec4<float> Texture::sampleBilinearRepeat(Vec2<float> texcoord) const
+{
+    float u = texcoord.x - std::floor(texcoord.x);
+    float v = texcoord.y - std::floor(texcoord.y);
+
+    // 从 [0,1] 转换到 [0, size-1] 的纹素坐标
+    float u_scaled = u * (mWidth - 1);
+    float v_scaled = v * (mHeight - 1);
+    
+    int x0 = static_cast<int>(std::floor(u_scaled));
+    int y0 = static_cast<int>(std::floor(v_scaled));
+    int x1 = std::min(x0 + 1, mWidth - 1);
+    int y1 = std::min(y0 + 1, mHeight - 1);
+    
+    float sx = u_scaled - x0;
+    float sy = v_scaled - y0;
+    
+    Vec4<float> p00 = getPixel(x0, y0);
+    Vec4<float> p10 = getPixel(x1, y0);
+    Vec4<float> p01 = getPixel(x0, y1);
+    Vec4<float> p11 = getPixel(x1, y1);
+    
+    Vec4<float> row0 = p00 * (1.0f - sx) + p10 * sx;
+    Vec4<float> row1 = p01 * (1.0f - sx) + p11 * sx;
+    
+    return row0 * (1.0f - sy) + row1 * sy;
+}
+
+Vec4<float> Texture::sampleBilinearClamp(Vec2<float> texcoord) const
+{
+    float u = clamp1(texcoord.x, 0.0f, 1.0f);
+    float v = clamp1(texcoord.y, 0.0f, 1.0f);
+    
+    // 从 [0,1] 转换到 [0, size-1] 的纹素坐标
+    float u_scaled = u * (mWidth - 1);
+    float v_scaled = v * (mHeight - 1);
+    
+    int x0 = static_cast<int>(std::floor(u_scaled));
+    int y0 = static_cast<int>(std::floor(v_scaled));
+    int x1 = std::min(x0 + 1, mWidth - 1);
+    int y1 = std::min(y0 + 1, mHeight - 1);
+    
+    float sx = u_scaled - x0;
+    float sy = v_scaled - y0;
+    
+    Vec4<float> p00 = getPixel(x0, y0);
+    Vec4<float> p10 = getPixel(x1, y0);
+    Vec4<float> p01 = getPixel(x0, y1);
+    Vec4<float> p11 = getPixel(x1, y1);
+    
+    Vec4<float> row0 = p00 * (1.0f - sx) + p10 * sx;
+    Vec4<float> row1 = p01 * (1.0f - sx) + p11 * sx;
+    
+    return row0 * (1.0f - sy) + row1 * sy;
+}
+
+Vec4<float> Texture::sampleBilinear(Vec2<float> texcoord) const
+{
+    return sampleBilinearClamp(texcoord); 
 }
 
 Cubemap::Cubemap()

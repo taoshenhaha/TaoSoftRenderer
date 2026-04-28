@@ -14,7 +14,7 @@ void RenderPipe::initialize(int width, int height)
     mCamera = new Camera({ 0.0f, 0.0f, 4.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
     mProgram = std::make_shared<ColorProgram>();
-    mProgram->m_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/floor_diffuse.tga", TextureUsage::LDR_COLOR);
+    mProgram->m_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/awesomeface.tga", TextureUsage::LDR_COLOR);
 }
 
 void RenderPipe::render()

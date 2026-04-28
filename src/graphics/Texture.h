@@ -12,6 +12,12 @@ enum class TextureUsage
     HDR_DATA
 };
 
+enum class TextureFilter
+{
+    NEAREST,
+    LINEAR
+};
+
 class Texture
 {
 public:
@@ -27,9 +33,19 @@ public:
     void fromColorbuffer(void* framebuffer);
     void fromDepthbuffer(void* framebuffer);
 
+    void setFilter(TextureFilter filter) { mFilter = filter; }
+    TextureFilter getFilter() const { return mFilter; }
+
     Vec4<float> sampleRepeat(Vec2<float> texcoord) const;
     Vec4<float> sampleClamp(Vec2<float> texcoord) const;
     Vec4<float> sample(Vec2<float> texcoord) const;
+
+    Vec4<float> sampleBilinearRepeat(Vec2<float> texcoord) const;
+    Vec4<float> sampleBilinearClamp(Vec2<float> texcoord) const;
+    Vec4<float> sampleBilinear(Vec2<float> texcoord) const;
+
+private:
+    Vec4<float> getPixel(int x, int y) const;
 
     int getWidth() const { return mWidth; }
     int getHeight() const { return mHeight; }
@@ -39,6 +55,7 @@ private:
     int mWidth{ 0 };
     int mHeight{ 0 };
     Vec4<float>* mBuffer{ nullptr };
+    TextureFilter mFilter{ TextureFilter::LINEAR };
 };
 
 class Cubemap
