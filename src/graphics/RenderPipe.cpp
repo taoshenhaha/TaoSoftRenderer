@@ -16,17 +16,21 @@ void RenderPipe::initialize(int width, int height)
     mCamera = new Camera({ 0.0f, 0.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
     // 创建着色器
-    mProgram = std::make_shared<BlinnPhongProgram>();
+    std::shared_ptr<Material> material = std::make_shared<Material>();
+    // 创建光源
+    std::shared_ptr<Light> light = std::make_shared<Light>();
+    light->position = Vec3<float>(10.0f, 10.0f, 10.0f);
+    light->color = Vec3<float>(1.0f, 1.0f, 1.0f);
+    light->specular = Vec3<float>(1.0f, 1.0f, 1.0f);
+    light->ambient = Vec3<float>(0.2f, 0.2f, 0.2f);
+    light->diffuse = Vec3<float>(0.5f, 0.5f, 0.5f);
 
-    // 设置材质
-    dynamic_cast<BlinnPhongProgram*>(mProgram.get())->setMaterial(
-        Vec3<float>(0.1f, 0.1f, 0.1f),  // ambient
-        Vec3<float>(0.8f, 0.8f, 0.8f),  // diffuse
-        Vec3<float>(1.0f, 1.0f, 1.0f),  // specular
-        32.0f  // shininess
-    );
-
-    mProgram->m_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/floor_diffuse.tga", TextureUsage::LDR_COLOR);
+    //设置材质
+    material->diffuse_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/container2.tga", TextureUsage::LDR_COLOR);
+    material->specular_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/container2_specular.tga", TextureUsage::LDR_COLOR);
+    material->shininess = 32.0f;
+    mProgram = std::make_shared<BlinnPhongProgram>(material, light);
+    
 }
 static float origin = 0.0f;
 static float lastFrame = 0.0f;
@@ -79,7 +83,7 @@ void RenderPipe::render()
         program->setUniform("mvp", mvp);
         program->setUniform("model", mModelMatrix);
         program->setUniform("view", mCamera->getViewMatrix());
-        program->setUniform("lightPosition", Vec3<float>(0, 3.0f, 4.0f));
+        program->setUniform("lightPosition", Vec3<float>(0, 5.0f, 4.0f));
         program->setUniform("cameraPosition", mCamera->getPosition()); 
         program->setUniform("projection", mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar));  
 

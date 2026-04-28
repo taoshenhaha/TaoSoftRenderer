@@ -62,14 +62,14 @@ software-renderer/
    • Uniform变量传递 ✅
 
 5. 光照模型 (1周)
-   • Blinn-Phong实现
+   • Blinn-Phong实现 ✅
 
    • 多光源支持
 
    • 法线映射（切线空间）
 
 6. 混合与测试 (2-3天)
-   • Alpha混合与测试
+   • Alpha混合与测试 ✅
 
    • 模板测试（可选）
 
