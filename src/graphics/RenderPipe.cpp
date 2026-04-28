@@ -58,9 +58,6 @@ void RenderPipe::render()
         Vec2<float> texcoord2 = { 1.0f, 0.0f };
         Vec2<float> texcoord3 = { 0.0f, 1.0f };
 
-
-
-        
         // 定义法线（用于法线着色器）
         Vec3<float> normal = { 0.0f, 0.0f, 1.0f };
         

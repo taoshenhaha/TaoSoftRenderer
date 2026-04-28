@@ -1,5 +1,8 @@
 #include "FrameBuffer.h"
 #include "utils/utils.h"
+#include <iostream>
+
+
 void FrameBuffer::clearColor( Vec4<float> color) 
 {
     int num_pixels = mWidth * mHeight;
@@ -29,11 +32,20 @@ void FrameBuffer::setPixel(int x, int y, Vec4<float> color)
     {
         return;
     }
-
+    
     mColorBuffer[y * mWidth + x].x = float_to_uchar(color.x);
     mColorBuffer[y * mWidth + x].y = float_to_uchar(color.y);
     mColorBuffer[y * mWidth + x].z = float_to_uchar(color.z);
     mColorBuffer[y * mWidth + x].w = float_to_uchar(color.w);
+}
+
+Vec4<float> FrameBuffer::getPixel(int x, int y)
+{
+    if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
+    {
+        return Vec4<float>(0.f, 0.f, 0.f, 0.f);
+    }
+    return mColorBuffer[y * mWidth + x];
 }
 
 void FrameBuffer::setDepth(int x, int y, float depth)

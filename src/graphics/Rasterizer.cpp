@@ -105,32 +105,7 @@ void Rasterizer::drawLineBresenham(Vec3<float> p1, Vec3<float> p2)
     // 绘制最后一个点
     setPixel(x2, y2, { 1.0f, 0.0f, 1.0f, 1.0f });
 }
-// void Rasterizer::drawTriangle(Vec3<float> p1, Vec3<float> p2, Vec3<float> p3)
-// {
-//     if (mFrameBuffer == nullptr)
-//     {
-//         return;
-//     }
 
-//     Vec2<float> p1_2 = { p1.x, p1.y };
-//     Vec2<float> p2_2 = { p2.x, p2.y };
-//     Vec2<float> p3_2 = { p3.x, p3.y };
-    
-//     bbox_t bbox = boundingBox({ p1_2, p2_2, p3_2 });    
-
-//     for (int y = bbox.min_y; y <= bbox.max_y; y++)
-//     {
-//         for (int x = bbox.min_x; x <= bbox.max_x; x++)
-//         {
-//             Vec2<float> p = { (float)x + 0.5f, (float)y + 0.5f };
-//             Vec3<float> weight = calcuateWeight(p, p1_2, p2_2, p3_2);
-//             if (weight.x > 0.0f && weight.y > 0.0f && weight.z > 0.0f)
-//             {
-//                 setPixel(x, y, { 1.0f, 1.0f, 1.0f, 1.0f });
-//             }
-//         }
-//     }
-// }
 void Rasterizer::setPixel(int x, int y, Vec4<float> color)
 {
     if (mFrameBuffer == nullptr)
@@ -239,7 +214,11 @@ void Rasterizer::interpolate_varyings(
     dst_varyings.texcoord = sum_texcoord * normalizer;
     
     Vec3<float> sum_world_position = src_varyings[0].world_position * weight0 + src_varyings[1].world_position * weight1 + src_varyings[2].world_position * weight2;
-    dst_varyings.world_position = sum_world_position * normalizer;    
+    dst_varyings.world_position = sum_world_position * normalizer;   
+    // dst_varyings.depth_position = interpolate(src_varyings[0].depth_position, src_varyings[1].depth_position, src_varyings[2].depth_position, weights); 
+    // dst_varyings.normal = interpolate(src_varyings[0].normal, src_varyings[1].normal, src_varyings[2].normal, weights); 
+    // dst_varyings.texcoord = interpolate(src_varyings[0].texcoord, src_varyings[1].texcoord, src_varyings[2].texcoord, weights); 
+    // dst_varyings.world_position = interpolate(src_varyings[0].world_position, src_varyings[1].world_position, src_varyings[2].world_position, weights); 
 }
 
 // 支持程序的三角形绘制
@@ -256,7 +235,6 @@ void Rasterizer::drawTriangleWithProgram(blinn_attribs_t attributes[3]) {
     }
 
     //clip三角形
-    //todo
     int num_vertices = clipTriangle();
     if (num_vertices == 0) {
         return;
@@ -515,6 +493,17 @@ int Rasterizer::rasterizeTriangle(Vec4<float> clip_coords[3], blinn_varyings_t v
                 interpolate_varyings(varyings, out_varyings, weights, recip_w);
                 // // 应用片段着色器
                 Vec4<float> color = m_currentProgram->fragmentShader(out_varyings);
+            /* perform blending */
+                if (true) {
+                    /* out_color = src_color * src_alpha + dst_color * (1 - src_alpha) */
+                    unsigned char dst_r = mFrameBuffer->getPixel(x, y).x;
+                    unsigned char dst_g = mFrameBuffer->getPixel(x, y).y;
+                    unsigned char dst_b = mFrameBuffer->getPixel(x, y).z;
+                    color.x = color.x * color.w + float_from_uchar(dst_r) * (1 - color.w);
+                    color.y = color.y * color.w + float_from_uchar(dst_g) * (1 - color.w);
+                    color.z = color.z * color.w + float_from_uchar(dst_b) * (1 - color.w);
+                }
+
                 setPixel(x, y, color);
             }
         }

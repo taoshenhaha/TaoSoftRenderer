@@ -8,6 +8,7 @@ constexpr float EPSILON = 1e-5f;
 constexpr int LINE_SIZE = 256;
 constexpr int PATH_SIZE = 256;
 unsigned char float_to_uchar(float value);
+float float_from_uchar(unsigned char value);
 int is_vertex_visible(Vec4<float> v);
 
 template<typename T>
