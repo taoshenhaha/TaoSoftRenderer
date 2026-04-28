@@ -115,3 +115,8 @@ Mat4<float> Camera::lookAt(Vec3<float> eye, Vec3<float> target, Vec3<float> up)
 
     return m;
 }
+
+Vec3<float> Camera::getPosition()
+{
+    return mPosition;
+}

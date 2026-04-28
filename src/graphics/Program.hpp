@@ -175,3 +175,81 @@ public:
 private:
     Vec3<float> m_color;
 };
+
+/**
+ * @brief BlinnPhongProgram类 - Blinn-Phong光照着色器
+ */
+class BlinnPhongProgram : public BaseProgram {
+public:
+    BlinnPhongProgram() 
+        : mAmbientColor(0.1f, 0.1f, 0.1f)
+        , mDiffuseColor(0.8f, 0.8f, 0.8f)
+        , mSpecularColor(0.0f, 1.0f, 1.0f)
+        , mShininess(128.0f) {}
+    
+    Vec4<float> vertexShader(blinn_attribs_t attribs) override {
+        Mat4<float> mvp = getMatrixUniform("mvp");
+        Mat4<float> model = getMatrixUniform("model");
+        
+        Vec4<float> clipPosition = mvp * Vec4<float>(attribs.position, 1.0f);
+        shader_varyings.world_position = (model * Vec4<float>(attribs.position, 1.0f)).toVec3();
+        
+        shader_varyings.normal = (model * Vec4<float>(attribs.normal, 0.0f)).toVec3().normalize();
+        
+        shader_varyings.texcoord = attribs.texcoord;
+        shader_varyings.depth_position = clipPosition.toVec3();
+        
+        return clipPosition;
+    }
+    
+    Vec4<float> fragmentShader(blinn_varyings_t varyings) override {
+        Vec3<float> N = varyings.normal.normalize();
+        
+        Vec3<float> lightPos = getVectorUniform("lightPosition");
+        Vec3<float> cameraPos = getVectorUniform("cameraPosition");
+        
+        Vec3<float> L = (lightPos - varyings.world_position).normalize();
+        Vec3<float> V = (cameraPos - varyings.world_position).normalize();
+        Vec3<float> H = (L + V).normalize(); //半程向量
+        
+        float NdotL = std::max(N.dot(L), 0.0f);
+        float NdotH = std::max(N.dot(H), 0.0f);
+        
+        Vec3<float> ambient = mAmbientColor;
+        
+        Vec3<float> diffuse = mDiffuseColor * NdotL;
+        
+        float spec = std::pow(NdotH, mShininess);
+        Vec3<float> specular = mSpecularColor * spec * 0.5f;
+        
+        Vec3<float> baseColor = Vec3<float>(0.0f, 1.0f, 1.0f);
+        float alpha = 1.0f;
+        // if (m_texture) {
+        //     Vec4<float> texel = m_texture->sample(varyings.texcoord);
+        //     baseColor = Vec3<float>(texel.x, texel.y, texel.z);
+        //     alpha = texel.w;
+        // }
+        
+        Vec3<float> result = /*ambient.hadamard(baseColor) + diffuse.hadamard(baseColor) + */specular;
+        // Vec3<float> result = ambient.hadamard(baseColor)+ diffuse.hadamard(baseColor) ;
+        return Vec4<float>(result, alpha);
+    }
+    
+    void setMaterial(const Vec3<float>& ambient, const Vec3<float>& diffuse, 
+                    const Vec3<float>& specular, float shininess) {
+        mAmbientColor = ambient;
+        mDiffuseColor = diffuse;
+        mSpecularColor = specular;
+        mShininess = shininess;
+    }
+    
+    void setTexture(Texture* texture) {
+        m_texture = texture;
+    }
+
+private:
+    Vec3<float> mAmbientColor;
+    Vec3<float> mDiffuseColor;
+    Vec3<float> mSpecularColor;
+    float mShininess;
+};

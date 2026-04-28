@@ -1,5 +1,7 @@
 #include "RenderPipe.h"
 #include "Program.hpp"
+#include "Mat4.hpp"
+#include "utils.h"
 
 RenderPipe::RenderPipe()
 {
@@ -11,22 +13,54 @@ RenderPipe::~RenderPipe()
 void RenderPipe::initialize(int width, int height)
 {
     mRasterizer = new Rasterizer(new FrameBuffer(width, height));
-    mCamera = new Camera({ 0.0f, 0.0f, 4.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+    mCamera = new Camera({ 0.0f, 0.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
-    mProgram = std::make_shared<ColorProgram>();
-    mProgram->m_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/awesomeface.tga", TextureUsage::LDR_COLOR);
+    // 创建着色器
+    mProgram = std::make_shared<BlinnPhongProgram>();
+
+    // 设置材质
+    dynamic_cast<BlinnPhongProgram*>(mProgram.get())->setMaterial(
+        Vec3<float>(0.1f, 0.1f, 0.1f),  // ambient
+        Vec3<float>(0.8f, 0.8f, 0.8f),  // diffuse
+        Vec3<float>(1.0f, 1.0f, 1.0f),  // specular
+        32.0f  // shininess
+    );
+
+    mProgram->m_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/floor_diffuse.tga", TextureUsage::LDR_COLOR);
 }
-
+static float origin = 0.0f;
+static float lastFrame = 0.0f;
+static float deltaTime = 0.0f;
+static bool isfirstframe = true;
 void RenderPipe::render()
 {
     //这里可以使用shader进行渲染    
+    float currentFrame = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1000.0f;
+    if(isfirstframe) {
+        isfirstframe = false;
+        lastFrame = currentFrame;   
+        return;
+    }
+    
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+    float modelmovespeed = static_cast<float>(5 * deltaTime);
+    
 
     float eye_fov = 45.0f;
     float aspect_ratio = (float)mRasterizer->getFramebuffer()->mWidth / mRasterizer->getFramebuffer()->mHeight;
     float zNear = 0.1f;
     float zFar = 50.0f;
     //先使用mvp矩阵乘法，将顶点坐标转换为屏幕坐标
+    // origin += modelmovespeed;
+    float angle = -origin * MY_PI / 180.0f; // 绕X轴逆时针旋转90度
+    float c = (float)cos(angle);
+    float s = (float)sin(angle);
     Mat4<float> mModelMatrix;
+    mModelMatrix.m[1][1] = c;
+    mModelMatrix.m[1][2] = -s;
+    mModelMatrix.m[2][1] = s;
+    mModelMatrix.m[2][2] = c;
     Mat4<float> mvp = mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar) * mCamera->getViewMatrix() * mModelMatrix;
     mRasterizer->clearColor({ 0.2f, 0.2f, 0.3f, 1.0f });
     mRasterizer->clearDepth(zFar);
@@ -36,24 +70,24 @@ void RenderPipe::render()
         return;
     }
     auto program = mProgram;
-    ColorProgram* colorProgram = dynamic_cast<ColorProgram*>(program.get());
-    if (colorProgram) {
-        colorProgram->setColor({ 1.0f, 1.0f, 0.0f });
-    }
+    BlinnPhongProgram* colorProgram = dynamic_cast<BlinnPhongProgram*>(program.get());
     if (colorProgram) {
         // 设置着色器到光栅化器
         mRasterizer->setProgram(program);
         
-        // 设置统一变量
+        // 设置 Uniform
         program->setUniform("mvp", mvp);
         program->setUniform("model", mModelMatrix);
         program->setUniform("view", mCamera->getViewMatrix());
-        program->setUniform("projection", mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar));
-        
+        program->setUniform("lightPosition", Vec3<float>(0, 3.0f, 4.0f));
+        program->setUniform("cameraPosition", mCamera->getPosition()); 
+        program->setUniform("projection", mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar));  
+
+
         // 使用着色器绘制另一个三角形（偏移位置）
-        Vec3<float> P1 = { -2.0f, -2.0f, -5.0f };
-        Vec3<float> P2 = { 2.0f, -2.0f, -5.0f };
-        Vec3<float> P3 = { -2.0f, 2.0f, -5.0f };
+        Vec3<float> P1 = { -2.0f, -2.0f, 0.0f };
+        Vec3<float> P2 = { 2.0f, -2.0f, 0.0f };
+        Vec3<float> P3 = { -2.0f, 2.0f, 0.0f };
         Vec2<float> texcoord1 = { 0.0f, 0.0f };
         Vec2<float> texcoord2 = { 1.0f, 0.0f };
         Vec2<float> texcoord3 = { 0.0f, 1.0f };
@@ -78,9 +112,9 @@ void RenderPipe::render()
         // program->setShaderAttribs(attributes);
         mRasterizer->drawTriangleWithProgram(attributes);
 
-        Vec3<float> P4 = { -2.0f, 2.0f, -5.0f };
-        Vec3<float> P5 = { 2.0f, -2.0f, -5.0f };
-        Vec3<float> P6 = { 2.0f, 2.0f, -5.0f };
+        Vec3<float> P4 = { -2.0f, 2.0f, 0.0f };
+        Vec3<float> P5 = { 2.0f, -2.0f, 0.0f };
+        Vec3<float> P6 = { 2.0f, 2.0f, 0.0f };
         Vec2<float> texcoord4 = { 0.0f, 1.0f };
         Vec2<float> texcoord5 = { 1.0f, 0.0f };
         Vec2<float> texcoord6 = { 1.0f, 1.0f };

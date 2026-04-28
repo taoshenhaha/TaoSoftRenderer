@@ -98,12 +98,12 @@ public:
     }
      Vec3 normalize()
     {
-        int len = length();
-        if (len == 0)
+        T len = length();
+        if (len == T(0))
         {
             return *this;
         }
-        return *this / T(len);
+        return *this / len;
     }
      T length()
     {
@@ -144,6 +144,11 @@ public:
     Vec3 lerp(const Vec3& rhs, T ratio) const
     {
         return Vec3(x + (rhs.x - x) * ratio, y + (rhs.y - y) * ratio, z + (rhs.z - z) * ratio);
+    }
+
+    Vec3 hadamard(const Vec3& rhs) const
+    {
+        return Vec3(x * rhs.x, y * rhs.y, z * rhs.z);
     }
 
 

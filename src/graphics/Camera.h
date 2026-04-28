@@ -8,6 +8,7 @@ public:
     Camera(Vec3<float> position, Vec3<float> target, Vec3<float> up);
     ~Camera();
     Mat4<float> getViewMatrix();
+    Vec3<float> getPosition();
     Mat4<float> getProjectionMatrix(float eye_fov, float aspect_ratio,
                                       float zNear, float zFar);
     Mat4<float> lookAt(Vec3<float> eye, Vec3<float> target, Vec3<float> up);
