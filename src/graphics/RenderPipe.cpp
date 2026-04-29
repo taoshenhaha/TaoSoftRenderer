@@ -14,7 +14,7 @@ RenderPipe::~RenderPipe()
 void RenderPipe::initialize(int width, int height)
 {
     mRasterizer = new Rasterizer(new FrameBuffer(width, height));
-    mCamera = new Camera({ 0.0f, 0.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+    mCamera = new Camera({ 0.0f, 1.0f, 5.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
     // 创建着色器
     std::shared_ptr<Material> material = std::make_shared<Material>();
@@ -31,7 +31,55 @@ void RenderPipe::initialize(int width, int height)
     material->specular_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/container2_specular.tga", TextureUsage::LDR_COLOR);
     material->shininess = 32.0f;
     mProgram = std::make_shared<BlinnPhongProgram>(material, light);
-    
+
+    // 初始化立方体顶点数据
+    float vertices[] = {
+        // positions          // normals           // texture coords
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
+    };
+    for (int i = 0; i < 288; i++) {
+        mVertices[i] = vertices[i];
+    }
 }
 static float origin = 0.0f;
 static float lastFrame = 0.0f;
@@ -90,54 +138,36 @@ void RenderPipe::render()
         program->setUniform("projection", mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar));  
 
 
-        // 使用着色器绘制另一个三角形（偏移位置）
-        Vec3<float> P1 = { -2.0f, -2.0f, 0.0f };
-        Vec3<float> P2 = { 2.0f, -2.0f, 0.0f };
-        Vec3<float> P3 = { -2.0f, 2.0f, 0.0f };
-        Vec2<float> texcoord1 = { 0.0f, 0.0f };
-        Vec2<float> texcoord2 = { 1.0f, 0.0f };
-        Vec2<float> texcoord3 = { 0.0f, 1.0f };
-
-        // 定义法线（用于法线着色器）
-        Vec3<float> normal = { 0.0f, 0.0f, 1.0f };
-        
+        // 使用着色器绘制立方体（36个顶点，12个三角形）
         blinn_attribs_t attributes[3];
 
-        attributes[0].position = P1;
-        attributes[0].texcoord = texcoord1;
-        attributes[0].normal = normal;
+        for (int i = 0; i < 12; i += 3) {
+            Vec3<float> pos1 = { mVertices[i*8], mVertices[i*8+1], mVertices[i*8+2] };
+            Vec3<float> pos2 = { mVertices[(i+1)*8], mVertices[(i+1)*8+1], mVertices[(i+1)*8+2] };
+            Vec3<float> pos3 = { mVertices[(i+2)*8], mVertices[(i+2)*8+1], mVertices[(i+2)*8+2] };
 
-        attributes[1].position = P2;
-        attributes[1].texcoord = texcoord2;
-        attributes[1].normal = normal;
+            Vec3<float> normal1 = { mVertices[i*8+3], mVertices[i*8+4], mVertices[i*8+5] };
+            Vec3<float> normal2 = { mVertices[(i+1)*8+3], mVertices[(i+1)*8+4], mVertices[(i+1)*8+5] };
+            Vec3<float> normal3 = { mVertices[(i+2)*8+3], mVertices[(i+2)*8+4], mVertices[(i+2)*8+5] };
 
-        attributes[2].position = P3;
-        attributes[2].texcoord = texcoord3;
-        attributes[2].normal = normal;
+            Vec2<float> tex1 = { mVertices[i*8+6], mVertices[i*8+7] };
+            Vec2<float> tex2 = { mVertices[(i+1)*8+6], mVertices[(i+1)*8+7] };
+            Vec2<float> tex3 = { mVertices[(i+2)*8+6], mVertices[(i+2)*8+7] };
 
-        // program->setShaderAttribs(attributes);
-        mRasterizer->drawTriangleWithProgram(attributes);
+            attributes[0].position = pos1;
+            attributes[0].normal = normal1;
+            attributes[0].texcoord = tex1;
 
-        Vec3<float> P4 = { -2.0f, 2.0f, 0.0f };
-        Vec3<float> P5 = { 2.0f, -2.0f, 0.0f };
-        Vec3<float> P6 = { 2.0f, 2.0f, 0.0f };
-        Vec2<float> texcoord4 = { 0.0f, 1.0f };
-        Vec2<float> texcoord5 = { 1.0f, 0.0f };
-        Vec2<float> texcoord6 = { 1.0f, 1.0f };
+            attributes[1].position = pos2;
+            attributes[1].normal = normal2;
+            attributes[1].texcoord = tex2;
 
-        attributes[0].position = P4;
-        attributes[0].texcoord = texcoord4;
-        attributes[0].normal = normal;
+            attributes[2].position = pos3;
+            attributes[2].normal = normal3;
+            attributes[2].texcoord = tex3;
 
-        attributes[1].position = P5;
-        attributes[1].texcoord = texcoord5;
-        attributes[1].normal = normal;
-
-        attributes[2].position = P6;
-        attributes[2].texcoord = texcoord6;
-        attributes[2].normal = normal;
-
-        mRasterizer->drawTriangleWithProgram(attributes);
+            mRasterizer->drawTriangleWithProgram(attributes);
+        }
     }
     
 }

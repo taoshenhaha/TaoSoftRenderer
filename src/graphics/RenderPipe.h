@@ -60,4 +60,6 @@ private:
     FPSCounter mFPSCounter;
     
     void drawFPS();
+    float mVertices[288];
+
 };
