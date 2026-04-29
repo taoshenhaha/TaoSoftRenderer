@@ -107,7 +107,7 @@ void RenderPipe::render()
     float zFar = 50.0f;
     //先使用mvp矩阵乘法，将顶点坐标转换为屏幕坐标
     // origin += modelmovespeed;
-    float angle = -origin * MY_PI / 180.0f; // 绕X轴逆时针旋转90度
+    float angle = origin * MY_PI / 180.0f; // 绕X轴逆时针旋转90度
     float c = (float)cos(angle);
     float s = (float)sin(angle);
     Mat4<float> mModelMatrix;
@@ -141,7 +141,7 @@ void RenderPipe::render()
         // 使用着色器绘制立方体（36个顶点，12个三角形）
         blinn_attribs_t attributes[3];
 
-        for (int i = 0; i < 12; i += 3) {
+        for (int i = 0; i < 36; i += 3) {
             Vec3<float> pos1 = { mVertices[i*8], mVertices[i*8+1], mVertices[i*8+2] };
             Vec3<float> pos2 = { mVertices[(i+1)*8], mVertices[(i+1)*8+1], mVertices[(i+1)*8+2] };
             Vec3<float> pos3 = { mVertices[(i+2)*8], mVertices[(i+2)*8+1], mVertices[(i+2)*8+2] };
