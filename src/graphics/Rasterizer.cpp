@@ -465,10 +465,10 @@ int Rasterizer::rasterizeTriangle(Vec4<float> clip_coords[3], blinn_varyings_t v
         screen_coords[i] = { (0.5f * ndc_coords[i].x + 0.5f) * width, (0.5f * ndc_coords[i].y + 0.5f) * height };
         screen_depth[i] = ndc_coords[i].z * f1 + f2;
     }
-    // 检查是否为背面向
-    if (is_back_facing(ndc_coords)) {
-        return 1;
-    }
+    // 检查是否为背面向 暂时先注释
+    // if (is_back_facing(ndc_coords)) {
+    //     return 1;
+    // }
 
     // 计算边界框
     bbox_t bbox = boundingBox(screen_coords);
