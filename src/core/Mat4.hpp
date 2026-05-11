@@ -222,7 +222,7 @@ Vec3<T> operator*(const Vec3<T>& rhs) const
  *
  * see http://www.songho.ca/opengl/gl_anglestoaxes.html
  */
-Mat4<T> mat4RotateX(float angle) 
+static Mat4<T> mat4RotateX(float angle) 
 {
     float c = (float)cos(angle);
     float s = (float)sin(angle);
@@ -244,7 +244,7 @@ Mat4<T> mat4RotateX(float angle)
  *
  * see http://www.songho.ca/opengl/gl_anglestoaxes.html
  */
-Mat4<T> mat4RotateY(float angle)
+static Mat4<T> mat4RotateY(float angle)
 {
     float c = (float)cos(angle);
     float s = (float)sin(angle);
@@ -278,6 +278,22 @@ Mat4<T> mat4RotateZ(float angle)
     return m;
 }
 
+static Mat4<T> mat4Scale(float sx, float sy, float sz) {
+    Mat4<T> m;
+    assert(sx != 0 && sy != 0 && sz != 0);
+    m.m[0][0] = sx;
+    m.m[1][1] = sy;
+    m.m[2][2] = sz;
+    return m;
+}
+
+static Mat4<T> mat4Translate(float tx, float ty, float tz) {
+    Mat4<T> m;
+    m.m[0][3] = tx;
+    m.m[1][3] = ty;
+    m.m[2][3] = tz;
+    return m;
+}
 /*
  * eye: the position of the eye point
  * target: the position of the target point

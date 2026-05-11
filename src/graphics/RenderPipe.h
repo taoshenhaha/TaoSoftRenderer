@@ -2,6 +2,7 @@
 #include "Rasterizer.h"
 #include "Camera.h"
 #include "Program.hpp"
+#include "geometry/mesh.h"
 #include <memory>
 #include <chrono>
 
@@ -58,8 +59,10 @@ private:
     Camera *mCamera{ nullptr };
     std::shared_ptr<BaseProgram> mProgram{ nullptr };
     FPSCounter mFPSCounter;
+    mesh_t* mMesh{ nullptr };
     
     void drawFPS();
+    void drawMesh();
     float mVertices[288];
 
 };

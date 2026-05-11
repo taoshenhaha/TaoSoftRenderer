@@ -14,7 +14,7 @@ RenderPipe::~RenderPipe()
 void RenderPipe::initialize(int width, int height)
 {
     mRasterizer = new Rasterizer(new FrameBuffer(width, height));
-    mCamera = new Camera({ 0.0f, 0.0f, 3.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+    mCamera = new Camera({ 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
     // 创建着色器
     std::shared_ptr<Material> material = std::make_shared<Material>();
@@ -27,73 +27,15 @@ void RenderPipe::initialize(int width, int height)
     light->diffuse = Vec3<float>(0.5f, 0.5f, 0.5f);
 
     //设置材质
-    material->diffuse_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/container2.tga", TextureUsage::LDR_COLOR);
-    material->specular_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/container2_specular.tga", TextureUsage::LDR_COLOR);
+    material->diffuse_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/centaur/body_diffuse.tga", TextureUsage::LDR_COLOR);
+    material->specular_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/centaur/body_specular.tga", TextureUsage::LDR_COLOR);
     material->shininess = 32.0f;
     mProgram = std::make_shared<BlinnPhongProgram>(material, light);
 
-    // 初始化立方体顶点数据
-    float vertices[] = {
-    // ==================== 后面 (Back Face) - Z = -0.5 ====================
-    // 从外部看（Z正方向），逆时针: 左上 -> 左下 -> 右下
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-
-    // ==================== 前面 (Front Face) - Z = +0.5 ====================
-    // 从外部看（Z负方向），逆时针: 左下 -> 右下 -> 右上
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-
-    // ==================== 左面 (Left Face) - X = -0.5 ====================
-    // 从外部看（X正方向），逆时针: 左前 -> 左后 -> 左后下
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-
-    // ==================== 右面 (Right Face) - X = +0.5 ====================
-    // 从外部看（X负方向），逆时针: 右后 -> 右前 -> 右前下
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-
-    // ==================== 底面 (Bottom Face) - Y = -0.5 ====================
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-    0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
-    0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-    0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-
-    // ==================== 顶面 (Top Face) - Y = +0.5 ====================
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-    0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-};
-    for (int i = 0; i < 288; i++) {
-        mVertices[i] = vertices[i];
+    // 加载模型
+    mMesh = mesh_load("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/centaur/body.obj");
+    if (mMesh) {
+        std::cout << "Loaded mesh: " << mesh_get_num_faces(mMesh) << " faces" << std::endl;
     }
 }
 
@@ -128,10 +70,20 @@ void RenderPipe::render()
     float c = (float)cos(angle);
     float s = (float)sin(angle);
     Mat4<float> mModelMatrix;
-    mModelMatrix.m[1][1] = c;
-    mModelMatrix.m[1][2] = -s;
-    mModelMatrix.m[2][1] = s;
-    mModelMatrix.m[2][2] = c;
+
+    // Mat4<float> translate = Mat4<float>::mat4Translate(-0.285f, 0.780f, 0.572f);
+    // Mat4<float> rotation = Mat4<float>::mat4RotateY(TO_RADIANS(180));
+    // Mat4<float> scale = Mat4<float>::mat4Scale(0.167f, 0.167f, 0.167f);
+    // mModelMatrix =  scale * rotation * translate;
+
+    Mat4<float> translation = Mat4<float>::mat4Translate(0.154f, -7.579f, -30.749f);
+    Mat4<float> rotation_x = Mat4<float>::mat4RotateX(TO_RADIANS(-90));
+    Mat4<float> rotation_y = Mat4<float>::mat4RotateY(TO_RADIANS(-60));
+    Mat4<float> rotation = rotation_y * rotation_x;
+    Mat4<float> scale = Mat4<float>::mat4Scale(0.016f, 0.016f, 0.016f);
+    mModelMatrix = scale * rotation * translation;
+
+
     Mat4<float> mvp = mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar) * mCamera->getViewMatrix() * mModelMatrix;
     mRasterizer->clearColor({ 0.2f, 0.2f, 0.3f, 1.0f });
     mRasterizer->clearDepth(zFar);
@@ -153,38 +105,8 @@ void RenderPipe::render()
         program->setUniform("lightPosition", Vec3<float>(0, 5.0f, 4.0f));
         program->setUniform("cameraPosition", mCamera->getPosition()); 
         program->setUniform("projection", mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar));  
-
-
-        // 使用着色器绘制立方体（36个顶点，12个三角形）
-        blinn_attribs_t attributes[3];
-
-        for (int i = 0; i < 36; i += 3) {
-            Vec3<float> pos1 = { mVertices[i*8], mVertices[i*8+1], mVertices[i*8+2] };
-            Vec3<float> pos2 = { mVertices[(i+1)*8], mVertices[(i+1)*8+1], mVertices[(i+1)*8+2] };
-            Vec3<float> pos3 = { mVertices[(i+2)*8], mVertices[(i+2)*8+1], mVertices[(i+2)*8+2] };
-
-            Vec3<float> normal1 = { mVertices[i*8+3], mVertices[i*8+4], mVertices[i*8+5] };
-            Vec3<float> normal2 = { mVertices[(i+1)*8+3], mVertices[(i+1)*8+4], mVertices[(i+1)*8+5] };
-            Vec3<float> normal3 = { mVertices[(i+2)*8+3], mVertices[(i+2)*8+4], mVertices[(i+2)*8+5] };
-
-            Vec2<float> tex1 = { mVertices[i*8+6], mVertices[i*8+7] };
-            Vec2<float> tex2 = { mVertices[(i+1)*8+6], mVertices[(i+1)*8+7] };
-            Vec2<float> tex3 = { mVertices[(i+2)*8+6], mVertices[(i+2)*8+7] };
-
-            attributes[0].position = pos1;
-            attributes[0].normal = normal1;
-            attributes[0].texcoord = tex1;
-
-            attributes[1].position = pos2;
-            attributes[1].normal = normal2;
-            attributes[1].texcoord = tex2;
-
-            attributes[2].position = pos3;
-            attributes[2].normal = normal3;
-            attributes[2].texcoord = tex3;
-
-            mRasterizer->drawTriangleWithProgram(attributes);
-        }
+        // 绘制加载的模型
+        drawMesh();
     }
     
 }
@@ -265,5 +187,29 @@ void RenderPipe::drawFPS()
                 }
             }
         }
+    }
+}
+
+void RenderPipe::drawMesh()
+{
+    if (!mMesh || !mProgram) return;
+    
+    auto program = mProgram;
+    BlinnPhongProgram* colorProgram = dynamic_cast<BlinnPhongProgram*>(program.get());
+    if (!colorProgram) return;
+    
+    vertex_t* vertices = mesh_get_vertices(mMesh);
+    int numFaces = mesh_get_num_faces(mMesh);
+    
+    blinn_attribs_t attributes[3];
+    
+    for (int i = 0; i < numFaces; i++) {
+        for (int j = 0; j < 3; j++) {
+            vertex_t& v = vertices[i * 3 + j];
+            attributes[j].position = v.position;
+            attributes[j].normal = v.normal;
+            attributes[j].texcoord = v.texcoord;
+        }
+        mRasterizer->drawTriangleWithProgram(attributes);
     }
 }

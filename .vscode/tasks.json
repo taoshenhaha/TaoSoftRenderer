@@ -11,11 +11,12 @@
                 "src/core/*.cpp",
                 "src/graphics/*.cpp",
                 "src/utils/*.cpp",
+                "src/geometry/*.cpp",
                 "-o",
                 "main",
                 "-std=c++11",
-                // "-O2",
-                "-g", // 调试时取消注释
+                "-O2",
+                // "-g", // 调试时取消注释
                 "-ldl",
                 "-I", "${workspaceFolder}/src/core",
                 "-I", "${workspaceFolder}/src",

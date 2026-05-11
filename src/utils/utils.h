@@ -29,3 +29,6 @@ T clamp1(const T& value, const T& low, const T& high) {
     if (value > high) return high;
     return value;
 }
+
+#define TO_RADIANS(degrees) ((MY_PI / 180) * (degrees))
+#define TO_DEGREES(radians) ((180 / MY_PI) * (radians))
