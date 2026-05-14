@@ -189,11 +189,14 @@ public:
     Vec4<float> vertexShader(blinn_attribs_t attribs) override {
         Mat4<float> mvp = getMatrixUniform("mvp");
         Mat4<float> model = getMatrixUniform("model");
-        
+        Mat3<float> normalModelMatrix = Mat4<float>::mat3_from_mat4(model);
+        Mat3<float> normalModel = Mat3<float>::mat3_inverse_transpose(normalModelMatrix);
+
+
         Vec4<float> clipPosition = mvp * Vec4<float>(attribs.position, 1.0f);
         shader_varyings.world_position = (model * Vec4<float>(attribs.position, 1.0f)).toVec3();
         
-        shader_varyings.normal = (model * Vec4<float>(attribs.normal, 0.0f)).toVec3().normalize();
+        shader_varyings.normal = (normalModel * attribs.normal.normalize()).normalize();
         
         shader_varyings.texcoord = attribs.texcoord;
         shader_varyings.depth_position = clipPosition.toVec3();
@@ -218,13 +221,19 @@ public:
         float NdotL = std::max(N.dot(L), 0.0f);
         float NdotH = std::max(N.dot(H), 0.0f);
         
+        if(NdotL < 0.00001)
+        {
+            printf("ddd");
+        }
         Vec3<float> ambient = mLight->ambient;
         
         // 漫反射
         Vec3<float> diffuseColor = Vec3<float>(1.0f, 1.0f, 1.0f);
+        float alpha = 1.0f;
         if (m_material->diffuse_texture) {
             Vec4<float> texel = m_material->diffuse_texture->sample(varyings.texcoord);
             diffuseColor = Vec3<float>(texel.x, texel.y, texel.z);
+            alpha = texel.w;
         }
 
         Vec3<float> diffuse = mLight->diffuse.hadamard(diffuseColor) * NdotL;
@@ -232,15 +241,20 @@ public:
         float spec = std::pow(NdotH, m_material->shininess);
         
         Vec3<float> specularColor = Vec3<float>(0.0f, 1.0f, 1.0f);
-        float alpha = 1.0f;
+        
         if (m_material->specular_texture) {
             Vec4<float> texel = m_material->specular_texture->sample(varyings.texcoord);
             specularColor = Vec3<float>(texel.x, texel.y, texel.z);
-            alpha = texel.w;
         }
         Vec3<float> specular = mLight->specular.hadamard(specularColor) * spec;
-        Vec3<float> result = mLight->ambient.hadamard(diffuseColor) + diffuse + specular ;
-        return Vec4<float>(result, alpha);
+        Vec3<float> result = /*mLight->ambient.hadamard(diffuseColor)  +*/ diffuse /*+ specular*/;
+        if(result.x < 0.001 || result.y < 0.001 || result.z < 0.001)
+        {
+            // printf("ddd");
+        }
+        
+        // return Vec4<float>(result, alpha);
+        return Vec4<float>(NdotL, NdotL, NdotL, 1.0f);
     }
     
     void setMaterial(std::shared_ptr<Material> material) {

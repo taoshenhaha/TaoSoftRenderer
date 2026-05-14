@@ -393,7 +393,47 @@ Vec3<T> getEulerAngles() const         // 获取欧拉角 (XYZ 顺序，返回 r
 
 
 
+static Mat3<T> mat3_inverse_transpose(Mat3<T> m) {
+    Mat3<T> adjoint, inverse_transpose;
+    T determinant, inv_determinant;
+    int i, j;
 
+    adjoint = mat3_adjoint(m);
+    determinant = mat3_determinant(m);
+    inv_determinant = 1 / determinant;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            inverse_transpose.m[i][j] = adjoint.m[i][j] * inv_determinant;
+        }
+    }
+    return inverse_transpose;
+}
+
+static Mat3<T> mat3_adjoint(Mat3<T> m) {
+    Mat3<T> adjoint;
+    adjoint.m[0][0] = +(m.m[1][1] * m.m[2][2] - m.m[2][1] * m.m[1][2]);
+    adjoint.m[0][1] = -(m.m[1][0] * m.m[2][2] - m.m[2][0] * m.m[1][2]);
+    adjoint.m[0][2] = +(m.m[1][0] * m.m[2][1] - m.m[2][0] * m.m[1][1]);
+    adjoint.m[1][0] = -(m.m[0][1] * m.m[2][2] - m.m[2][1] * m.m[0][2]);
+    adjoint.m[1][1] = +(m.m[0][0] * m.m[2][2] - m.m[2][0] * m.m[0][2]);
+    adjoint.m[1][2] = -(m.m[0][0] * m.m[2][1] - m.m[2][0] * m.m[0][1]);
+    adjoint.m[2][0] = +(m.m[0][1] * m.m[1][2] - m.m[1][1] * m.m[0][2]);
+    adjoint.m[2][1] = -(m.m[0][0] * m.m[1][2] - m.m[1][0] * m.m[0][2]);
+    adjoint.m[2][2] = +(m.m[0][0] * m.m[1][1] - m.m[1][0] * m.m[0][1]);
+    return adjoint;
+}
+
+/*
+ * for determinant, adjoint, and inverse, see
+ * 3D Math Primer for Graphics and Game Development, 2nd Edition, Chapter 6
+ */
+
+static T mat3_determinant(Mat3<T> m) {
+    T a = +m.m[0][0] * (m.m[1][1] * m.m[2][2] - m.m[1][2] * m.m[2][1]);
+    T b = -m.m[0][1] * (m.m[1][0] * m.m[2][2] - m.m[1][2] * m.m[2][0]);
+    T c = +m.m[0][2] * (m.m[1][0] * m.m[2][1] - m.m[1][1] * m.m[2][0]);
+    return a + b + c;
+}
 
 
 

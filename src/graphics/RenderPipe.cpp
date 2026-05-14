@@ -20,20 +20,21 @@ void RenderPipe::initialize(int width, int height)
     std::shared_ptr<Material> material = std::make_shared<Material>();
     // 创建光源
     std::shared_ptr<Light> light = std::make_shared<Light>();
-    light->position = Vec3<float>(10.0f, 10.0f, 10.0f);
+    light->position = Vec3<float>(1.0f, 1.0f, 1.0f);
     light->color = Vec3<float>(1.0f, 1.0f, 1.0f);
     light->specular = Vec3<float>(1.0f, 1.0f, 1.0f);
     light->ambient = Vec3<float>(0.2f, 0.2f, 0.2f);
     light->diffuse = Vec3<float>(0.5f, 0.5f, 0.5f);
 
     //设置材质
-    material->diffuse_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/centaur/body_diffuse.tga", TextureUsage::LDR_COLOR);
-    material->specular_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/centaur/body_specular.tga", TextureUsage::LDR_COLOR);
-    material->shininess = 32.0f;
+    material->diffuse_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/output.tga", TextureUsage::LDR_COLOR);
+    // material->diffuse_texture->saveToFile("output.tga");
+    material->specular_texture = Texture::createFromFile("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/output.tga", TextureUsage::LDR_COLOR);
+    material->shininess = 128.0f;
     mProgram = std::make_shared<BlinnPhongProgram>(material, light);
 
     // 加载模型
-    mMesh = mesh_load("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/centaur/body.obj");
+    mMesh = mesh_load("/Users/bigo/Desktop/jianli/TaoSoftRenderer/assets/common/sphere.obj");
     if (mMesh) {
         std::cout << "Loaded mesh: " << mesh_get_num_faces(mMesh) << " faces" << std::endl;
     }
@@ -76,12 +77,12 @@ void RenderPipe::render()
     // Mat4<float> scale = Mat4<float>::mat4Scale(0.167f, 0.167f, 0.167f);
     // mModelMatrix =  scale * rotation * translate;
 
-    Mat4<float> translation = Mat4<float>::mat4Translate(0.154f, -7.579f, -30.749f);
-    Mat4<float> rotation_x = Mat4<float>::mat4RotateX(TO_RADIANS(-90));
-    Mat4<float> rotation_y = Mat4<float>::mat4RotateY(TO_RADIANS(-60));
-    Mat4<float> rotation = rotation_y * rotation_x;
-    Mat4<float> scale = Mat4<float>::mat4Scale(0.016f, 0.016f, 0.016f);
-    mModelMatrix = scale * rotation * translation;
+    Mat4<float> translation = Mat4<float>::mat4Translate(0.002f, 0.187f, 0);
+    Mat4<float> rotation_x = Mat4<float>::mat4RotateX(TO_RADIANS(90));
+    // Mat4<float> rotation_y = Mat4<float>::mat4RotateY(TO_RADIANS(-90));
+    // Mat4<float> rotation = rotation_y * rotation_x;
+    Mat4<float> scale = Mat4<float>::mat4Scale(0.5f, 0.5f, 0.5f);
+    mModelMatrix = scale * rotation_x * translation;
 
 
     Mat4<float> mvp = mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar) * mCamera->getViewMatrix() * mModelMatrix;
@@ -102,7 +103,7 @@ void RenderPipe::render()
         program->setUniform("mvp", mvp);
         program->setUniform("model", mModelMatrix);
         program->setUniform("view", mCamera->getViewMatrix());
-        program->setUniform("lightPosition", Vec3<float>(0, 5.0f, 4.0f));
+        program->setUniform("lightPosition", Vec3<float>(0, 1.0f, 4.0f));
         program->setUniform("cameraPosition", mCamera->getPosition()); 
         program->setUniform("projection", mCamera->getProjectionMatrix(eye_fov, aspect_ratio, zNear, zFar));  
         // 绘制加载的模型

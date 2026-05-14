@@ -210,6 +210,7 @@ void Rasterizer::interpolate_varyings(
     
     Vec3<float> sum_normal = src_varyings[0].normal * weight0 + src_varyings[1].normal * weight1 + src_varyings[2].normal * weight2;
     dst_varyings.normal = sum_normal * normalizer;
+
     Vec2<float> sum_texcoord = src_varyings[0].texcoord * weight0 + src_varyings[1].texcoord * weight1 + src_varyings[2].texcoord * weight2;
     dst_varyings.texcoord = sum_texcoord * normalizer;
     
@@ -464,11 +465,12 @@ int Rasterizer::rasterizeTriangle(Vec4<float> clip_coords[3], blinn_varyings_t v
         ndc_coords[i] = clip_coords[i].toVec3() / clip_coords[i].w;
         screen_coords[i] = { (0.5f * ndc_coords[i].x + 0.5f) * width, (0.5f * ndc_coords[i].y + 0.5f) * height };
         screen_depth[i] = ndc_coords[i].z * f1 + f2;
+        // screen_depth[i] = (ndc_coords[i].z + 1) * 0.5;
     }
     // 检查是否为背面向 暂时先注释
-    // if (is_back_facing(ndc_coords)) {
-    //     return 1;
-    // }
+    if (is_back_facing(ndc_coords)) {
+        return 1;
+    }
 
     // 计算边界框
     bbox_t bbox = boundingBox(screen_coords);
@@ -478,8 +480,8 @@ int Rasterizer::rasterizeTriangle(Vec4<float> clip_coords[3], blinn_varyings_t v
         for (int x = bbox.min_x; x <= bbox.max_x; x++) {
             Vec2<float> p = { (float)x + 0.5f, (float)y + 0.5f };
             Vec3<float> weights = calcuateWeight(p, screen_coords[0], screen_coords[1], screen_coords[2]);
-            
-            if (weights.x >= 0.0f && weights.y >= 0.0f && weights.z >= 0.0f) {
+
+            if (weights.x >= -EPSILON && weights.y >= -EPSILON && weights.z >= -EPSILON) {
                 //插值深度
                 float depth = interpolate1(screen_depth[0], screen_depth[1], screen_depth[2], weights);
                 //深度测试

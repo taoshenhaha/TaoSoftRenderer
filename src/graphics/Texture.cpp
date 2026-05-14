@@ -174,6 +174,27 @@ void Texture::fromDepthbuffer(void* framebuffer)
 {
 }
 
+bool Texture::saveToFile(const char* filename)
+{
+    image_t* image = image_create(mWidth, mHeight, 4, FORMAT_LDR);
+    if (!image)
+        return false;
+
+    for (int i = 0; i < mWidth * mHeight; i++)
+    {
+        Vec4<float>& texel = mBuffer[i];
+        unsigned char* pixel = &image->ldr_buffer[i * 4];
+        pixel[0] = static_cast<unsigned char>(clamp1(1.0f, 0.0f, 1.0f) * 255.0f);
+        pixel[1] = static_cast<unsigned char>(clamp1(1.0f, 0.0f, 1.0f) * 255.0f);
+        pixel[2] = static_cast<unsigned char>(clamp1(1.0f, 0.0f, 1.0f) * 255.0f);
+        pixel[3] = static_cast<unsigned char>(clamp1(1.0f, 0.0f, 1.0f) * 255.0f);
+    }
+
+    image_save(image, filename);
+    image_release(image);
+    return true;
+}
+
 Vec4<float> Texture::sampleRepeat(Vec2<float> texcoord) const
 {
     float u = texcoord.x - std::floor(texcoord.x);
@@ -191,6 +212,10 @@ Vec4<float> Texture::sampleClamp(Vec2<float> texcoord) const
     int c = static_cast<int>((mWidth - 1) * u);
     int r = static_cast<int>((mHeight - 1) * v);
     int index = r * mWidth + c;
+    if(mBuffer[index].x < 0.0001f)
+    {
+        printf("dd");
+    }
     return mBuffer[index];
 }
 
@@ -200,7 +225,7 @@ Vec4<float> Texture::sample(Vec2<float> texcoord) const
     {
         return sampleBilinear(texcoord);
     }
-    return sampleRepeat(texcoord);
+    return sampleClamp(texcoord);
 }
 
 Vec4<float> Texture::getPixel(int x, int y) const

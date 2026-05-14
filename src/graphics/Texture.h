@@ -44,6 +44,8 @@ public:
     Vec4<float> sampleBilinearClamp(Vec2<float> texcoord) const;
     Vec4<float> sampleBilinear(Vec2<float> texcoord) const;
 
+    bool saveToFile(const char* filename);
+
 private:
     Vec4<float> getPixel(int x, int y) const;
 
@@ -55,7 +57,7 @@ private:
     int mWidth{ 0 };
     int mHeight{ 0 };
     Vec4<float>* mBuffer{ nullptr };
-    TextureFilter mFilter{ TextureFilter::LINEAR };
+    TextureFilter mFilter{ TextureFilter::NEAREST };
 };
 
 class Cubemap

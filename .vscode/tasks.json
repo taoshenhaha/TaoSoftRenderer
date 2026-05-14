@@ -15,8 +15,8 @@
                 "-o",
                 "main",
                 "-std=c++11",
-                "-O2",
-                // "-g", // 调试时取消注释
+                // "-O2",
+                "-g", // 调试时取消注释
                 "-ldl",
                 "-I", "${workspaceFolder}/src/core",
                 "-I", "${workspaceFolder}/src",

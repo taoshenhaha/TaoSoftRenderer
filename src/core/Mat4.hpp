@@ -312,4 +312,86 @@ static Mat4<T> mat4Translate(float tx, float ty, float tz) {
  */
 
 
+ static Mat4<T> inverseTranspose(Mat4<T> m) {
+    Mat4<T> adjoint, inverse_transpose;
+    float determinant, inv_determinant;
+    int i, j;
+
+    adjoint = mat4_adjoint(m);
+    determinant = 0;
+    for (i = 0; i < 4; i++) {
+        determinant += m.m[0][i] * adjoint.m[0][i];
+    }
+    inv_determinant = 1 / determinant;
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            inverse_transpose.m[i][j] = adjoint.m[i][j] * inv_determinant;
+        }
+    }
+    return inverse_transpose;
+}
+
+
+static Mat4<T> transpose(Mat4<T> m) {
+    Mat4<T> transpose;
+    int i, j;
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            transpose.m[i][j] = m.m[j][i];
+        }
+    }
+    return transpose;
+}
+
+static T mat3_determinant(Mat3<T> m) {
+    T a = +m.m[0][0] * (m.m[1][1] * m.m[2][2] - m.m[1][2] * m.m[2][1]);
+    T b = -m.m[0][1] * (m.m[1][0] * m.m[2][2] - m.m[1][2] * m.m[2][0]);
+    T c = +m.m[0][2] * (m.m[1][0] * m.m[2][1] - m.m[1][1] * m.m[2][0]);
+    return a + b + c;
+}
+
+static T mat4_minor(Mat4<T> m, int r, int c) {
+    Mat3<T> cut_down;
+    int i, j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            int row = i < r ? i : i + 1;
+            int col = j < c ? j : j + 1;
+            cut_down.m[i][j] = m.m[row][col];
+        }
+    }
+    return mat3_determinant(cut_down);
+}
+
+static T mat4_cofactor(Mat4<T> m, int r, int c) {
+    T sign = (r + c) % 2 == 0 ? 1.0f : -1.0f;
+    T minor = mat4_minor(m, r, c);
+    return sign * minor;
+}
+
+static Mat4<T> mat4_adjoint(Mat4<T> m) {
+    Mat4<T> adjoint;
+    int i, j;
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            adjoint.m[i][j] = mat4_cofactor(m, i, j);
+        }
+    }
+    return adjoint;
+}
+
+static Mat3<T> mat3_from_mat4(Mat4<T> m) {
+    Mat3<T> n;
+    n.m[0][0] = m.m[0][0];
+    n.m[0][1] = m.m[0][1];
+    n.m[0][2] = m.m[0][2];
+    n.m[1][0] = m.m[1][0];
+    n.m[1][1] = m.m[1][1];
+    n.m[1][2] = m.m[1][2];
+    n.m[2][0] = m.m[2][0];
+    n.m[2][1] = m.m[2][1];
+    n.m[2][2] = m.m[2][2];
+    return n;
+}
+
 };
