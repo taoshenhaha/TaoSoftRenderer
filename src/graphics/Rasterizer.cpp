@@ -148,10 +148,10 @@ bbox_t Rasterizer::boundingBox(Vec2<float> screen_coords[3])
     float maxY = std::max(std::max(p1.y, p2.y), p3.y);
 
     bbox_t bbox;
-    bbox.min_x = std::max((int)std::ceil(minX), 0);
-    bbox.min_y = std::max((int)std::ceil(minY), 0);
-    bbox.max_x = std::min((int)std::floor(maxX), mFrameBuffer->mWidth - 1);
-    bbox.max_y = std::min((int)std::floor(maxY), mFrameBuffer->mHeight - 1);
+    bbox.min_x = std::max((int)std::floor(minX), 0);
+    bbox.min_y = std::max((int)std::floor(minY), 0);
+    bbox.max_x = std::min((int)std::ceil(maxX), mFrameBuffer->mWidth - 1);
+    bbox.max_y = std::min((int)std::ceil(maxY), mFrameBuffer->mHeight - 1);
     
     return bbox;
 }
@@ -478,10 +478,10 @@ int Rasterizer::rasterizeTriangle(Vec4<float> clip_coords[3], blinn_varyings_t v
     // 光栅化
     for (int y = bbox.min_y; y <= bbox.max_y; y++) {
         for (int x = bbox.min_x; x <= bbox.max_x; x++) {
-            Vec2<float> p = { (float)x + 0.5f, (float)y + 0.5f };
+            Vec2<float> p = { (float)x + 0.5f , (float)y + 0.5f };
             Vec3<float> weights = calcuateWeight(p, screen_coords[0], screen_coords[1], screen_coords[2]);
 
-            if (weights.x >= -EPSILON && weights.y >= -EPSILON && weights.z >= -EPSILON) {
+            if (weights.x > -EPSILON && weights.y > -EPSILON && weights.z > -EPSILON) {
                 //插值深度
                 float depth = interpolate1(screen_depth[0], screen_depth[1], screen_depth[2], weights);
                 //深度测试

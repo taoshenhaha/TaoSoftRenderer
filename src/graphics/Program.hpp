@@ -220,11 +220,7 @@ public:
         
         float NdotL = std::max(N.dot(L), 0.0f);
         float NdotH = std::max(N.dot(H), 0.0f);
-        
-        if(NdotL < 0.00001)
-        {
-            printf("ddd");
-        }
+
         Vec3<float> ambient = mLight->ambient;
         
         // 漫反射
@@ -247,14 +243,9 @@ public:
             specularColor = Vec3<float>(texel.x, texel.y, texel.z);
         }
         Vec3<float> specular = mLight->specular.hadamard(specularColor) * spec;
-        Vec3<float> result = /*mLight->ambient.hadamard(diffuseColor)  +*/ diffuse /*+ specular*/;
-        if(result.x < 0.001 || result.y < 0.001 || result.z < 0.001)
-        {
-            // printf("ddd");
-        }
+        Vec3<float> result = mLight->ambient.hadamard(diffuseColor)  + diffuse + specular;
         
-        // return Vec4<float>(result, alpha);
-        return Vec4<float>(NdotL, NdotL, NdotL, 1.0f);
+        return Vec4<float>(result, alpha);
     }
     
     void setMaterial(std::shared_ptr<Material> material) {

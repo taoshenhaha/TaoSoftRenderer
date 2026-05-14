@@ -212,10 +212,6 @@ Vec4<float> Texture::sampleClamp(Vec2<float> texcoord) const
     int c = static_cast<int>((mWidth - 1) * u);
     int r = static_cast<int>((mHeight - 1) * v);
     int index = r * mWidth + c;
-    if(mBuffer[index].x < 0.0001f)
-    {
-        printf("dd");
-    }
     return mBuffer[index];
 }
 
