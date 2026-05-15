@@ -1,10 +1,11 @@
 #pragma once
-
+#include "Vec3.hpp"
 struct Light {
-    Vec3<float> position;
-    Vec3<float> color;
-    Vec3<float> specular;
-    Vec3<float> ambient;
-    Vec3<float> diffuse;
+    Vec3<float> background;
+    char environment[LINE_SIZE];
+    char skybox[LINE_SIZE];
+    char shadow[LINE_SIZE];
+    float ambient;
+    float punctual;
     
 };
